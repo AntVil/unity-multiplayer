@@ -390,10 +390,7 @@ MonoBehaviour:
   leftHandNetwork: {fileID: 8153514209319162513}
   rightHandNetwork: {fileID: 45499778916456451}
   headNetwork: {fileID: 7811788231084085709}
-  leftHand: {fileID: 0}
-  rightHand: {fileID: 0}
-  head: {fileID: 0}
-  color: {r: 0, g: 0, b: 0, a: 0}
+  color: {r: 1, g: 1, b: 1, a: 0}
   colors:
   - {r: 1, g: 0, b: 0.6, a: 0}
   - {r: 1, g: 0.6, b: 0, a: 0}
@@ -401,4 +398,9 @@ MonoBehaviour:
   - {r: 0, g: 1, b: 0.6, a: 0}
   - {r: 0, g: 0.6, b: 1, a: 0}
   - {r: 0.6, g: 0, b: 1, a: 0}
-  playerId: 0
+  - {r: 0.6666667, g: 0, b: 0.33333334, a: 0}
+  - {r: 0.6666667, g: 0.33333334, b: 0, a: 0}
+  - {r: 0.33333334, g: 0.6666667, b: 0, a: 0}
+  - {r: 0, g: 0.6666667, b: 0.33333334, a: 0}
+  - {r: 0, g: 0.33333334, b: 0.6666667, a: 0}
+  - {r: 0.33333334, g: 0, b: 0.6666667, a: 0}

@@ -2,21 +2,19 @@ using UnityEngine;
 
 public class NetworkPlayer : Unity.Netcode.NetworkBehaviour
 {
+    // synced objects
     public GameObject leftHandNetwork;
     public GameObject rightHandNetwork;
     public GameObject headNetwork;
 
-    public GameObject leftHand;
-    public GameObject rightHand;
-    public GameObject head;
+    // actual objects
+    private GameObject leftHand;
+    private GameObject rightHand;
+    private GameObject head;
 
     public Color color;
 
     public Color[] colors;
-
-    public uint playerId = 0;
-
-    private static uint playerSession = 0;
 
     public void Start()
     {
@@ -35,30 +33,13 @@ public class NetworkPlayer : Unity.Netcode.NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        if (IsServer)
-        {
-            print("running server code");
-            print(playerSession);
+        if (IsOwner) return;
 
-            playerSession += 1;
-            UpdateUnsetColorClientRpc(playerSession);
-        }
-    }
+        ulong playerId = OwnerClientId % (ulong)colors.Length;
 
-    [Unity.Netcode.ClientRpc]
-    private void UpdateUnsetColorClientRpc(uint serverPlayerSession)
-    {
-        print("running client code");
-        if(playerId == 0)
-        {
-            playerId = serverPlayerSession % (uint)colors.Length;
-            if (!IsOwner)
-            {
-                leftHandNetwork.GetComponent<MeshRenderer>().material.color = colors[playerId];
-                rightHandNetwork.GetComponent<MeshRenderer>().material.color = colors[playerId];
-                headNetwork.GetComponent<MeshRenderer>().material.color = colors[playerId];
-            }
-        }
+        leftHandNetwork.GetComponent<MeshRenderer>().material.color = colors[playerId];
+        rightHandNetwork.GetComponent<MeshRenderer>().material.color = colors[playerId];
+        headNetwork.GetComponent<MeshRenderer>().material.color = colors[playerId];
     }
 
     private GameObject getActiveGameObjectWithTag(string tag)
@@ -71,16 +52,11 @@ public class NetworkPlayer : Unity.Netcode.NetworkBehaviour
             }
         }
 
+        // edge case
         return null;
     }
 
-    private Color calculateColor()
-    {
-        return new Color(0, 128, 255);
-    }
-
-
-    void Update()
+    public void Update()
     {
         if (IsOwner)
         {
