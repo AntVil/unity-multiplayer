@@ -11,10 +11,12 @@ public class KeyboardController : MonoBehaviour
     public float lookSpeed = 2.0f;
     public float lookXLimit = 45.0f;
 
-    CharacterController characterController;
-    Vector3 moveDirection = Vector3.zero;
-    float rotationX = 0;
-    float rotationY = 0;
+    private CharacterController characterController;
+    private Vector3 moveDirection = Vector3.zero;
+    private float rotationX = 0;
+    private float rotationY = 0;
+    
+    private bool returnedHome = false;
 
     [HideInInspector]
     public bool canMove = true;
@@ -60,19 +62,32 @@ public class KeyboardController : MonoBehaviour
         // Move the controller
         characterController.Move(moveDirection * Time.deltaTime);
 
-        //print(Input.GetAxis("Mouse X"));
-        //print(Input.GetAxis("Mouse Y"));
-
         // Player and Camera rotation
         if (canMove)
         {
             rotationX += -Input.GetAxis("Mouse Y") * lookSpeed;
             rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
-            //print(rotationX);
             rotationY += Input.GetAxis("Mouse X") * lookSpeed;
-            //print(rotationY);
             playerCamera.transform.localRotation = Quaternion.Euler(rotationX, rotationY, 0);
-            //transform.rotation *= Quaternion.Euler(0, , 0);
+        }
+
+        //print(returnedHome);
+
+        // teleport home logic
+        if (Input.GetButton("ReturnHome"))
+        {
+            if (!returnedHome)
+            {
+                print("returned");
+                characterController.enabled = false;
+                transform.position = new Vector3(0, 0, 0);
+                characterController.enabled = true;
+            }
+            returnedHome = true;
+        }
+        else
+        {
+            returnedHome = false;
         }
     }
 }
