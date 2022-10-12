@@ -26,9 +26,9 @@ public class NetworkPlayer : Unity.Netcode.NetworkBehaviour
             Destroy(headNetwork.GetComponent<MeshRenderer>());
         }
 
-        leftHand = getActiveGameObjectWithTag("LeftHand");
-        rightHand = getActiveGameObjectWithTag("RightHand");
-        head = getActiveGameObjectWithTag("MainCamera");
+        leftHand = GetActiveGameObjectWithTag("LeftHand");
+        rightHand = GetActiveGameObjectWithTag("RightHand");
+        head = GetActiveGameObjectWithTag("MainCamera");
     }
 
     public override void OnNetworkSpawn()
@@ -42,7 +42,7 @@ public class NetworkPlayer : Unity.Netcode.NetworkBehaviour
         headNetwork.GetComponent<MeshRenderer>().material.color = colors[playerId];
     }
 
-    private GameObject getActiveGameObjectWithTag(string tag)
+    private GameObject GetActiveGameObjectWithTag(string tag)
     {
         foreach (GameObject obj in GameObject.FindGameObjectsWithTag(tag))
         {
