@@ -9,7 +9,7 @@ public class ReturnHome : MonoBehaviour
     public TextMeshProUGUI text;
 
     public GameObject player;
-    public KeyboardController keyboardController;
+    public CharacterController characterController;
 
     private const float WILL_RETURN_HOME = 0;
     private const float CAN_RETURN_HOME = -1;
@@ -19,55 +19,75 @@ public class ReturnHome : MonoBehaviour
     private float returnHomeCounter = CAN_RETURN_HOME;
     private bool returning = false;
 
+    public float returnHomeCooldownSeconds;
+    private float returnHomeCooldown = 0;
+
     public void Update()
     {
         // teleport home logic
-        if (returning)
+        if (returnHomeCooldown <= 0)
         {
-            if (returnHomeCounter == CAN_RETURN_HOME)
+            if (returning)
             {
-                // initiate return home
-                returnHomeCounter = WILL_RETURN_HOME;
-            }
-            else if (returnHomeCounter > returnHomeSeconds)
-            {
-                // return home if counter is full
-                
-                // vr
-                player.transform.position = new Vector3(0, 0, 0);
+                if (returnHomeCounter == CAN_RETURN_HOME)
+                {
+                    // initiate return home
+                    returnHomeCounter = WILL_RETURN_HOME;
+                }
+                else if (returnHomeCounter > returnHomeSeconds)
+                {
+                    // return home if counter is full
 
-                // keyboard
-                keyboardController.enabled = false;
-                keyboardController.transform.position = new Vector3(0, 0, 0);
-                keyboardController.enabled = true;
+                    // vr
+                    player.transform.position = new Vector3(0, 0, 0);
 
-                returnHomeCounter = HAS_RETURNED_HOME;
-                UpdateScreen();
+                    // keyboard
+                    characterController.enabled = false;
+                    characterController.transform.position = new Vector3(0, 0, 0);
+                    characterController.enabled = true;
+
+                    returnHomeCounter = HAS_RETURNED_HOME;
+                    returnHomeCooldown = returnHomeCooldownSeconds;
+                    UpdateScreen();
+                }
+                else if (returnHomeCounter != HAS_RETURNED_HOME)
+                {
+                    // count up
+                    returnHomeCounter += Time.deltaTime;
+                    UpdateScreen();
+                }
             }
-            else if (returnHomeCounter != HAS_RETURNED_HOME)
+            else if (returnHomeCounter != CAN_RETURN_HOME)
             {
-                // count up
-                returnHomeCounter += Time.deltaTime;
+                returnHomeCounter = CAN_RETURN_HOME;
                 UpdateScreen();
             }
         }
-        else if (returnHomeCounter != CAN_RETURN_HOME)
+        else
         {
-            returnHomeCounter = CAN_RETURN_HOME;
+            returnHomeCooldown -= Time.deltaTime;
             UpdateScreen();
         }
     }
 
     private void UpdateScreen()
     {
-        if (returnHomeCounter > 0)
+        if(returnHomeCooldown <= 0)
         {
-            text.text = $"zurück in {(int)Math.Ceiling(returnHomeSeconds - returnHomeCounter)}";
-            SetAlpha(returnHomeCounter / returnHomeSeconds);
+            if (returnHomeCounter > 0)
+            {
+                text.text = $"zurück in {(int)Math.Ceiling(returnHomeSeconds - returnHomeCounter)}";
+                SetAlpha(returnHomeCounter / returnHomeSeconds);
+            }
+            else
+            {
+                SetAlpha(0);
+            }
         }
         else
         {
-            SetAlpha(0);
+            text.text = "willkommen zurück";
+            SetAlpha(returnHomeCooldown / returnHomeCooldownSeconds);
         }
     }
 

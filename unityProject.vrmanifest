@@ -5,7 +5,7 @@
       "app_key": "application.generated.unity.multiplayer.exe",
       "launch_type": "url",
       "url": "steam://launch/",
-      "action_manifest_path": "C:\\Users\\Jan\\Documents\\GitHub\\unity-multiplayer\\Assets\\StreamingAssets\\SteamVR\\actions.json",
+      "action_manifest_path": "D:\\Privat\\Projects\\Unity\\unity-multiplayer\\Assets\\StreamingAssets\\SteamVR\\actions.json",
       "strings": {
         "en_us": {
           "name": "Multiplayer [Testing]"
