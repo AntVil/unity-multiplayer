@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using System.Collections;
 
@@ -15,9 +16,15 @@ public class KeyboardController : MonoBehaviour
     private Vector3 moveDirection = Vector3.zero;
     private float rotationX = 0;
     private float rotationY = 0;
-    
-    private bool returnedHome = false;
 
+    private const float WILL_RETURN_HOME = 0;
+    private const float CAN_RETURN_HOME = -1;
+    private const float HAS_RETURNED_HOME = -2;
+
+    public BlackScreen blackScreen;
+    public float returnHomeSeconds;
+    private float returnHomeCounter = CAN_RETURN_HOME;
+    
     [HideInInspector]
     public bool canMove = true;
 
@@ -28,6 +35,8 @@ public class KeyboardController : MonoBehaviour
         // Lock cursor
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        updateBlackScreen();
     }
 
     void Update()
@@ -71,23 +80,46 @@ public class KeyboardController : MonoBehaviour
             playerCamera.transform.localRotation = Quaternion.Euler(rotationX, rotationY, 0);
         }
 
-        //print(returnedHome);
-
         // teleport home logic
         if (Input.GetButton("ReturnHome"))
         {
-            if (!returnedHome)
+            if (returnHomeCounter == CAN_RETURN_HOME)
             {
-                print("returned");
+                // initiate return home
+                returnHomeCounter = WILL_RETURN_HOME;
+            }
+            else if (returnHomeCounter > returnHomeSeconds)
+            {
+                // return home if counter is full
                 characterController.enabled = false;
                 transform.position = new Vector3(0, 0, 0);
                 characterController.enabled = true;
+                returnHomeCounter = HAS_RETURNED_HOME;
+                updateBlackScreen();
             }
-            returnedHome = true;
+            else if (returnHomeCounter != HAS_RETURNED_HOME)
+            {
+                // count up
+                returnHomeCounter += Time.deltaTime;
+                updateBlackScreen();
+            }
+        }
+        else if(returnHomeCounter != CAN_RETURN_HOME) {
+            returnHomeCounter = CAN_RETURN_HOME;
+            updateBlackScreen();
+        }
+    }
+
+    public void updateBlackScreen()
+    {
+        if(returnHomeCounter > 0)
+        {
+            blackScreen.SetText($"zurück in {(int)Math.Ceiling(returnHomeSeconds - returnHomeCounter)}");
+            blackScreen.SetAlpha(returnHomeCounter / returnHomeSeconds);
         }
         else
         {
-            returnedHome = false;
+            blackScreen.SetAlpha(0);
         }
     }
 }
