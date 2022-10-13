@@ -1,6 +1,4 @@
-using System;
 using UnityEngine;
-using System.Collections;
 
 public class KeyboardController : MonoBehaviour
 {
@@ -17,13 +15,7 @@ public class KeyboardController : MonoBehaviour
     private float rotationX = 0;
     private float rotationY = 0;
 
-    private const float WILL_RETURN_HOME = 0;
-    private const float CAN_RETURN_HOME = -1;
-    private const float HAS_RETURNED_HOME = -2;
-
-    public BlackScreen blackScreen;
-    public float returnHomeSeconds;
-    private float returnHomeCounter = CAN_RETURN_HOME;
+    public ReturnHome returnHome;
     
     [HideInInspector]
     public bool canMove = true;
@@ -35,8 +27,6 @@ public class KeyboardController : MonoBehaviour
         // Lock cursor
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-
-        updateBlackScreen();
     }
 
     void Update()
@@ -83,43 +73,11 @@ public class KeyboardController : MonoBehaviour
         // teleport home logic
         if (Input.GetButton("ReturnHome"))
         {
-            if (returnHomeCounter == CAN_RETURN_HOME)
-            {
-                // initiate return home
-                returnHomeCounter = WILL_RETURN_HOME;
-            }
-            else if (returnHomeCounter > returnHomeSeconds)
-            {
-                // return home if counter is full
-                characterController.enabled = false;
-                transform.position = new Vector3(0, 0, 0);
-                characterController.enabled = true;
-                returnHomeCounter = HAS_RETURNED_HOME;
-                updateBlackScreen();
-            }
-            else if (returnHomeCounter != HAS_RETURNED_HOME)
-            {
-                // count up
-                returnHomeCounter += Time.deltaTime;
-                updateBlackScreen();
-            }
-        }
-        else if(returnHomeCounter != CAN_RETURN_HOME) {
-            returnHomeCounter = CAN_RETURN_HOME;
-            updateBlackScreen();
-        }
-    }
-
-    public void updateBlackScreen()
-    {
-        if(returnHomeCounter > 0)
-        {
-            blackScreen.SetText($"zurück in {(int)Math.Ceiling(returnHomeSeconds - returnHomeCounter)}");
-            blackScreen.SetAlpha(returnHomeCounter / returnHomeSeconds);
+            returnHome.StartReturn();
         }
         else
         {
-            blackScreen.SetAlpha(0);
+            returnHome.StopReturn();
         }
     }
 }
