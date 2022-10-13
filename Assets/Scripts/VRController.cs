@@ -10,6 +10,7 @@ public class VRController : MonoBehaviour
         if (SteamVR_Actions._default.ReturnHome.GetStateDown(SteamVR_Input_Sources.Any))
         {
             returnHome.StartReturn();
+            print("jo geht");
         }
         else
         {
