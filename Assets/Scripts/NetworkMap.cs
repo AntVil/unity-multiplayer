@@ -13,11 +13,16 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
     }
 
     [Unity.Netcode.ClientRpc]
-    private void UpdateModelClientRpc(ulong modelId)
+    public void UpdateModelClientRpc(string modelId)
     {
         if (IsServer) return;
         if (!IsOwner) return;
 
         // TODO: Request/Download Model from server
+        string url = webserver.getRequestURL();
+        // getModelName
+        // getModelImage
+        // getModelObj
+        // getModelMtl
     }
 }
