@@ -1,19 +1,35 @@
 using UnityEngine;
+using System;
 
 public class NetworkVoiceChat : Unity.Netcode.NetworkBehaviour
 {
-    public int frequency = 44100;
+    public int frequency = 8000;
     public int channels = 1;
+
+    private int recordingFrequency;
 
     private AudioClip recording;
     private int lastPos;
     private int pos;
 
+    private float frequencyFactor;
+    private float inverseFrequencyFactor;
+
     public override void OnNetworkSpawn()
     {
         if (IsOwner)
         {
-            recording = Microphone.Start(null, true, 1, frequency);
+            // get lowest possible sample rate (less downsample calculations)
+            int minFreq;
+            int maxFreq;
+            Microphone.GetDeviceCaps(null, out minFreq, out maxFreq);
+            recordingFrequency = Math.Max(minFreq, frequency);
+
+            // precalculate factors for later use
+            frequencyFactor = (float)(((double)frequency) / ((double)recordingFrequency));
+            inverseFrequencyFactor = (float)(1.0 / frequencyFactor);
+            
+            recording = Microphone.Start(null, true, 1, recordingFrequency);
         }
         else
         {
@@ -52,7 +68,11 @@ public class NetworkVoiceChat : Unity.Netcode.NetworkBehaviour
                     // Get the data from microphone.
                     recording.GetData(sample, lastPos);
 
-                    ShareAudioServerRpc(sample, lastPos);
+                    // convert and send data to everybody
+                    ShareAudioServerRpc(
+                        GetNetworkCommonFrequency(sample),
+                        (int)Math.Floor(((float)lastPos) * frequencyFactor)
+                    );
 
                     lastPos = pos;
                 }
@@ -60,16 +80,30 @@ public class NetworkVoiceChat : Unity.Netcode.NetworkBehaviour
         }
     }
 
+    private float[] GetNetworkCommonFrequency(float[] sample){
+        int outputSize = (int)Math.Floor(((float)sample.Length) * frequencyFactor);
+
+        // downsample by taking the closest sample point to the left
+        float[] output = new float[outputSize];
+        float step = 0;
+        for(int i=0;i<output.Length;i++){
+            output[i] = sample[(int)Math.Floor(step)];
+            step += inverseFrequencyFactor;
+        }
+
+        return output;
+    }
+
     [Unity.Netcode.ServerRpc]
-    public void ShareAudioServerRpc(float[] sample, int lastPos)
+    private void ShareAudioServerRpc(float[] sample, int lastPos)
     {
-        if (!IsServer) return;
+        if (!IsOwner) return;
 
         ShareAudioClientRpc(sample, lastPos);
     }
 
     [Unity.Netcode.ClientRpc]
-    public void ShareAudioClientRpc(float[] sample, int lastPos)
+    private void ShareAudioClientRpc(float[] sample, int lastPos)
     {
         if (IsOwner) return;
 

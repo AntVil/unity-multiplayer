@@ -514,5 +514,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b6d43e5b3cb329844b053fd4c0b9b60d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  frequency: 44100
+  frequency: 8000
   channels: 1
