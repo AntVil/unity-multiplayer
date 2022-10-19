@@ -97,7 +97,7 @@ public class NetworkVoiceChat : Unity.Netcode.NetworkBehaviour
     [Unity.Netcode.ServerRpc]
     private void ShareAudioServerRpc(float[] sample, int lastPos)
     {
-        if (!IsOwner) return;
+        if (!IsServer) return;
 
         ShareAudioClientRpc(sample, lastPos);
     }
