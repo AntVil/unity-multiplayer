@@ -18,6 +18,11 @@ public class WebServer : Unity.Netcode.NetworkBehaviour{
     public NetworkMap networkMap;
     public int port;
 
+    public int availableModelsCount = 3;
+    private bool[] updateAvailableModelNames;
+    private bool[] updateAvailableModelImages;
+    private bool[] updateAvailableModels;
+
     private string address;
     private HttpListener listener;
     private bool runningWebServer;
@@ -35,6 +40,10 @@ public class WebServer : Unity.Netcode.NetworkBehaviour{
         if (IsServer){
             serverThread = new Thread(this.RunBackendLoop);
             serverThread.Start();
+
+            updateAvailableModelNames = new bool[availableModelsCount];
+            updateAvailableModelImages = new bool[availableModelsCount];
+            updateAvailableModels = new bool[availableModelsCount];
         }
     }
 
@@ -46,7 +55,7 @@ public class WebServer : Unity.Netcode.NetworkBehaviour{
 
     private void RunBackendLoop(){
         listener = new HttpListener();
-        listener.Prefixes.Add(getRequestURL());
+        listener.Prefixes.Add(GetRequestURL());
         listener.Start();
 
         Task listenTask = HandleIncomingConnections();
@@ -200,12 +209,14 @@ public class WebServer : Unity.Netcode.NetworkBehaviour{
 
     private void ValidateSetModelName(List<string> urlPath, HttpListenerRequest req, HttpListenerResponse res){
         if(IsValidLogin(urlPath) && urlPath.Count > 2){
-            string index = Int32.Parse(urlPath[2]).ToString();
+            int index = Int32.Parse(urlPath[2]);
             File.WriteAllBytes(
                 Path.GetFullPath(modelPath + $"model_{index}.txt"),
                 GetFullRequestContentBytes(req)
             );
             SendResponse(res, "application/json", "{\"response\": \"access allowed\"}");
+            
+            updateAvailableModelNames[index] = true;
         }else{
             SendResponse(res, "application/json", "{\"response\": \"access denied\"}");
         }
@@ -213,12 +224,14 @@ public class WebServer : Unity.Netcode.NetworkBehaviour{
     
     private void ValidateSetModelImage(List<string> urlPath, HttpListenerRequest req, HttpListenerResponse res){
         if(IsValidLogin(urlPath) && urlPath.Count > 2){
-            string index = Int32.Parse(urlPath[2]).ToString();
+            int index = Int32.Parse(urlPath[2]);
             File.WriteAllBytes(
                 Path.GetFullPath(modelPath + $"model_{index}.png"),
                 GetFullRequestContentBytes(req)
             );
             SendResponse(res, "application/json", "{\"response\": \"access allowed\"}");
+
+            updateAvailableModelImages[index] = true;
         }else{
             SendResponse(res, "application/json", "{\"response\": \"access denied\"}");
         }
@@ -226,7 +239,7 @@ public class WebServer : Unity.Netcode.NetworkBehaviour{
     
     private void ValidateSetModelIfc(List<string> urlPath, HttpListenerRequest req, HttpListenerResponse res){
         if(IsValidLogin(urlPath) && urlPath.Count > 2){
-            string index = Int32.Parse(urlPath[2]).ToString();
+            int index = Int32.Parse(urlPath[2]);
             File.WriteAllBytes(
                 Path.GetFullPath(modelPath + $"model_{index}.ifc"),
                 GetFullRequestContentBytes(req)
@@ -246,7 +259,7 @@ public class WebServer : Unity.Netcode.NetworkBehaviour{
         }
     }
 
-    private void ConvertIfcFile(string ifcPath, string objPath, string modelId){
+    private void ConvertIfcFile(string ifcPath, string objPath, int modelId){
         int threads = 1;
 
         System.Diagnostics.Process process = new System.Diagnostics.Process();
@@ -266,11 +279,28 @@ public class WebServer : Unity.Netcode.NetworkBehaviour{
             fs.Write(mtlPathBytes, 0, mtlPathBytes.Length);
         }
 
-        // TODO: send client 
-        //networkMap.UpdateModelClientRpc(modelId);
+        updateAvailableModels[modelId] = true;
     }
 
-    public string getRequestURL(){
+    public bool[] GetUpdateAvailableModelNames(){
+        bool[] result = updateAvailableModelNames;
+        updateAvailableModelNames = new bool[result.Length];
+        return result;
+    }
+
+    public bool[] GetUpdateAvailableModelImages(){
+        bool[] result = updateAvailableModelImages;
+        updateAvailableModelImages = new bool[result.Length];
+        return result;
+    }
+
+    public bool[] GetUpdateAvailableModels(){
+        bool[] result = updateAvailableModels;
+        updateAvailableModels = new bool[result.Length];
+        return result;
+    }
+
+    public string GetRequestURL(){
         return $"http://{address}:{port}/";
     }
 }

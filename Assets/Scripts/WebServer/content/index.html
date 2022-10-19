@@ -5,7 +5,20 @@
         <style></style>
 
         <script>
-            function upload(){
+            function uploadName(){
+                const options = {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/octet-stream'},
+                    body: document.getElementById("name").value
+                };
+
+                fetch('http://127.0.0.1:8888/setModelName/123/0', options)
+                .then(response => response.json())
+                .then(response => console.log(response))
+                .catch(err => console.error(err));
+            }
+            
+            function uploadModel(){
                 const options = {
                     method: 'POST',
                     headers: {'Content-Type': 'application/octet-stream'},
@@ -21,7 +34,11 @@
     </head>
     <body>
         <h1>Hello World!</h1>
+        
+        <input id="name" type="text" />
+        <button onclick="uploadName()">upload</button>
+        
         <input id="file" type="file" />
-        <button onclick="upload()">upload</button>
+        <button onclick="uploadModel()">upload</button>
     </body>
 </html>
