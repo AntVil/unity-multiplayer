@@ -115,6 +115,14 @@ public class WebServer : Unity.Netcode.NetworkBehaviour{
         }
     }
 
+    private void SendResponse(HttpListenerResponse res, string contentType, byte[] rawdata){
+        res.ContentType = contentType;
+        //res.ContentEncoding = Encoding.UTF8;
+        res.ContentLength64 = rawdata.LongLength;
+        res.OutputStream.Write(rawdata, 0, rawdata.Length);
+        res.Close();
+    }
+    
     private void SendResponse(HttpListenerResponse res, string contentType, string rawdata){
         byte[] data = Encoding.UTF8.GetBytes(rawdata);
         res.ContentType = contentType;
@@ -144,7 +152,7 @@ public class WebServer : Unity.Netcode.NetworkBehaviour{
     private void SendModelImage(List<string> urlPath, HttpListenerResponse res){
         if(urlPath.Count > 1){
             string index = Int32.Parse(urlPath[1]).ToString();
-            SendResponse(res, "image/png", File.ReadAllText(Path.GetFullPath(modelPath + $"model_{index}.png")));
+            SendResponse(res, "image/png", File.ReadAllBytes(Path.GetFullPath(modelPath + $"model_{index}.png")));
         }else{
             SendNotFound(res);
         }
