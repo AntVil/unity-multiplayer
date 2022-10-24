@@ -2,43 +2,329 @@
 <html>
     <head>
         <title></title>
-        <style></style>
+        <style>
+            :root{
+                --theme-color-0: #FFF;
+                --theme-color-1: #DDD;
+                --theme-color-2: #AAA;
+                --theme-color-3: #09F;
+                --font-color: #000;
+            }
 
-        <script>
-            function uploadName(){
-                const options = {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/octet-stream'},
-                    body: document.getElementById("name").value
-                };
+            @media (prefers-color-scheme: dark) {
+                :root{
+                    --theme-color-0: #111;
+                    --theme-color-1: #333;
+                    --theme-color-2: #555;
+                    --theme-color-3: #F90;
+                    --font-color: #FFF;
+                }
+            }
 
-                fetch('http://127.0.0.1:8888/setModelName/123/0', options)
-                .then(response => response.json())
-                .then(response => console.log(response))
-                .catch(err => console.error(err));
+            *{
+                box-sizing: border-box;
+                color: var(--font-color);
+                text-align: center;
+                transition: all 0.25s;
+                font-size: large;
+            }
+
+            input[type="radio"], input[type='file']{
+                display: none;
             }
             
-            function uploadModel(){
+            body{
+                margin: 0;
+                background-color: var(--theme-color-0);
+            }
+
+            body>*{
+                width: 100vw;
+                height: 100vh;
+            }
+
+            input, button{
+                background-color: var(--theme-color-2);
+                border: none;
+                border-radius: 5px;
+            }
+
+            button:hover{
+                background-color: var(--theme-color-3);
+                cursor: pointer;
+            }
+
+            body>input:not(:checked)+*{
+                display: none;
+            }
+
+            header{
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            header>form{
+                display: grid;
+                gap: 5px;
+                padding: 15px;
+                border-radius: 15px;
+                background-color: var(--theme-color-1);
+            }
+
+            nav{
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr;
+                align-items: center;
+                /*padding: 15px;
+                gap: 15px;*/
+            }
+
+            nav>section{
+                display: grid;
+                border-radius: 15px;
+                background-color: var(--theme-color-1);
+                margin: 15px;
+            }
+
+            nav>section:hover{
+                margin: 0px;
+                z-index: 1;
+                background-color: var(--theme-color-3);
+                cursor: pointer;
+            }
+
+            nav>section>img{
+                width: 100%;
+                aspect-ratio: 1 / 1;
+                overflow: hidden;
+                object-fit: contain;
+                background-color: var(--theme-color-2);
+                border-radius: 15px 15px 0 0;
+                border-bottom: 1px solid var(--theme-color-0);
+            }
+
+            main{
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            main>form{
+                width: 80%;
+                height: 80%;
+                display: grid;
+                grid-template-rows: auto 1fr 1fr auto auto;
+                gap: 5px;
+                padding: 15px;
+                border-radius: 15px;
+                background-color: var(--theme-color-1);
+            }
+
+            .dropZone{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border-radius: 20px;
+                background-color: var(--theme-color-2);
+                border: 5px dashed var(--theme-color-0);
+            }
+
+            .dropZone:hover{
+                background-color: var(--theme-color-3);
+            }
+
+            .dropZone>label{
+                padding: 5px;
+                border-radius: 20px;
+                background-color: var(--theme-color-2);
+            }
+
+            .dropZone>label:hover{
+                cursor: pointer;
+                background-color: var(--theme-color-3);
+                filter: brightness(120%);
+            }
+        </style>
+
+        <script>
+            let password = "";
+            let currentModel = 0;
+
+            async function login(){
+                const options = { method: 'POST' };
+
+                password = document.getElementById("password").value;
+
+                const response = await (await fetch(`/login/${password}`, options)).json();
+
+                if(response.response === "access allowed"){
+                    loadNav();
+                }else{
+                    document.getElementById("password").style.backgroundColor = "#F30";
+                }
+            }
+
+            async function loadNav(){
+                // reload text
+                document.getElementById("modelName0").innerText = await(await fetch("/getModelName/0")).text();
+                document.getElementById("modelName1").innerText = await(await fetch("/getModelName/1")).text();
+                document.getElementById("modelName2").innerText = await(await fetch("/getModelName/2")).text();
+                
+                // reload images
+                await Promise.all(
+                    [
+                        fetch("/getModelImage/0", { cache: 'reload', mode: 'no-cors' }),
+                        fetch("/getModelImage/1", { cache: 'reload', mode: 'no-cors' }),
+                        fetch("/getModelImage/2", { cache: 'reload', mode: 'no-cors' })
+                    ]
+                )
+
+                document.getElementById("modelImage0").src = "/getModelImage/0";
+                document.getElementById("modelImage1").src = "/getModelImage/1";
+                document.getElementById("modelImage2").src = "/getModelImage/2";
+
+
+                document.getElementsByTagName("nav")[0].previousElementSibling.checked = true;
+            }
+
+            function loadModel(id){
+                document.getElementById('modelName').value = document.getElementById(`modelName${id}`).innerText;
+
+                document.getElementById('modelImage').parentElement.children[1].innerText = 'Bild-Datei Auswählen (.png)';
+                document.getElementById('modelModel').parentElement.children[1].innerText = 'Modell-Datei Auswählen (.ifc)';
+
+                document.getElementById('modelImage').ariaFiles = [''];
+                document.getElementById('modelModel').ariaFiles = [''];
+
+                currentModel = id;
+
+                document.getElementsByTagName("main")[0].previousElementSibling.checked = true;
+            }
+
+            function dropHandler(e){
+                e.preventDefault();
+                
+                let file = e.dataTransfer.items[0].getAsFile();
+
+                let target = e.target;
+                if(target.nodeName.toLowerCase() !== 'div'){
+                    target = target.parentElement;
+                }
+
+                let ext = file.name.split('.')[1];
+                if(target.children[0].accept.includes(ext)){
+                    target.children[0].value = '';
+                    target.children[0].ariaFiles = [file];
+                    target.children[1].innerText = file.name;
+                }
+            }
+
+            function dragHandler(e){
+                e.preventDefault();
+            }
+
+            async function upload(){
+                Promise.all(
+                    [
+                        uploadModelName(),
+                        uploadModelImage(),
+                        uploadModelModel()
+                    ]
+                );
+
+                loadNav();
+            }
+
+            async function uploadModelName(){
                 const options = {
                     method: 'POST',
                     headers: {'Content-Type': 'application/octet-stream'},
-                    body: document.getElementById("file").files[0]
+                    body: document.getElementById("modelName").value
                 };
 
-                fetch('http://127.0.0.1:8888/setModelIfc/123/0', options)
-                .then(response => response.json())
-                .then(response => console.log(response))
-                .catch(err => console.error(err));
+                const response = await (await fetch(`/setModelName/${password}/${currentModel}`, options)).json();
+            }
+            
+            async function uploadModelImage(){
+                let file = document.getElementById("modelImage").files[0];
+                if(file === undefined || file === null || file === ""){
+                    file = document.getElementById("modelImage").ariaFiles[0];
+                }
+
+                if(file !== undefined && file !== null && file !== ""){
+                    const options = {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/octet-stream'},
+                        body: file
+                    };
+
+                    const response = await (await fetch(`/setModelImage/${password}/${currentModel}`, options)).json();
+                }
+            }
+            
+            async function uploadModelModel(){
+                let file = document.getElementById("modelModel").files[0];
+                if(file === undefined || file === null || file === ""){
+                    file = document.getElementById("modelModel").ariaFiles[0];
+                }
+                
+                if(file !== undefined && file !== null && file !== ""){
+                    const options = {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/octet-stream'},
+                        body: file
+                    };
+
+                    const response = await (await fetch(`/setModelIfc/${password}/${currentModel}`, options)).json();
+                }
             }
         </script>
     </head>
     <body>
-        <h1>Hello World!</h1>
-        
-        <input id="name" type="text" />
-        <button onclick="uploadName()">upload</button>
-        
-        <input id="file" type="file" />
-        <button onclick="uploadModel()">upload</button>
+        <input name="screens" type="radio" checked />
+        <header>
+            <form onsubmit="return false">
+                <input id="password" type="password" placeholder="Passwort"/>
+                <button type="submit" onclick="login()">Login</button>
+            </form>
+        </header>
+
+        <input name="screens" type="radio" />
+        <nav>
+            <section onclick="loadModel(0)">
+                <img id="modelImage0" />
+                <div id="modelName0"></div>
+            </section>
+            <section onclick="loadModel(1)">
+                <img id="modelImage1" />
+                <div id="modelName1"></div>
+            </section>
+            <section onclick="loadModel(2)">
+                <img id="modelImage2" />
+                <div id="modelName2"></div>
+            </section>
+        </nav>
+
+        <input name="screens" type="radio" />
+        <main>
+            <form onsubmit="return false">
+                <input id="modelName" />
+
+                <div class='dropZone' ondrop='dropHandler(event);' ondragover='dragHandler(event)'>
+                    <input id='modelImage' type='file' accept='.png' onchange='this.parentElement.children[1].innerText=this.files[0].name' ariaFiles='['']' />
+                    <label for='modelImage'></label>
+                </div>
+
+                <div class='dropZone' ondrop='dropHandler(event);' ondragover='dragHandler(event)'>
+                    <input id='modelModel' type='file' accept='.ifc' onchange='this.parentElement.children[1].innerText=this.files[0].name' ariaFiles='['']' />
+                    <label for='modelModel'></label>
+                </div>
+
+                <button onclick="loadNav()">Abbrechen</button>
+                
+                <button onclick="upload()">Überschreiben</button>
+            </form>
+        </main>
     </body>
 </html>
