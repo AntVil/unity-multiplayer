@@ -63,6 +63,8 @@ public class NetworkPlayer : Unity.Netcode.NetworkBehaviour
             leftHandNetwork.transform.position = leftHand.transform.position;
             rightHandNetwork.transform.position = rightHand.transform.position;
             headNetwork.transform.position = head.transform.position;
+
+            headNetwork.transform.rotation = head.transform.rotation;
         }
     }
 }

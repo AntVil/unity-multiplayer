@@ -115,7 +115,7 @@
             {
                "inputs" : {
                   "click" : {
-                     "output" : "/actions/default/in/interactui"
+                     "output" : "/actions/default/in/negativereaction"
                   }
                },
                "mode" : "button",
@@ -151,7 +151,7 @@
             {
                "inputs" : {
                   "click" : {
-                     "output" : "/actions/default/in/interactui"
+                     "output" : "/actions/default/in/positivereaction"
                   }
                },
                "mode" : "button",
