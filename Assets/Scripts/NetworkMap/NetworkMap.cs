@@ -176,16 +176,16 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
 
     [Unity.Netcode.ClientRpc]
     public void UpdateModelNameClientRpc(int modelId){
-        if(IsOwner){ UpdateModelNameFile(modelId); }
+        UpdateModelNameFile(modelId);
     }
 
     [Unity.Netcode.ClientRpc]
     public void UpdateModelImageClientRpc(int modelId){
-        if(IsOwner){ UpdateModelImageFile(modelId); }
+        UpdateModelImageFile(modelId);
     }
 
     [Unity.Netcode.ClientRpc]
     public void UpdateModelClientRpc(int modelId){
-        if(IsOwner){ UpdateModelFile(modelId); }
+        UpdateModelFile(modelId);
     }
 }
