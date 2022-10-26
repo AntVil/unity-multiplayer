@@ -14816,6 +14816,10 @@ PrefabInstance:
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 4390491868590911289, guid: 65ef54bab3cdfac408ba48a6abc2e9ea, type: 3}
+      propertyPath: teleportationArea
+      value: 
+      objectReference: {fileID: 2912414211809110911, guid: 9f8cebf6ad411764fbffcc05dfd7ac62, type: 3}
+    - target: {fileID: 4390491868590911289, guid: 65ef54bab3cdfac408ba48a6abc2e9ea, type: 3}
       propertyPath: texts.Array.data[0]
       value: 
       objectReference: {fileID: 1220922984}
@@ -14839,6 +14843,10 @@ PrefabInstance:
       propertyPath: images.Array.data[2]
       value: 
       objectReference: {fileID: 1580163861}
+    - target: {fileID: 4390491868590911289, guid: 65ef54bab3cdfac408ba48a6abc2e9ea, type: 3}
+      propertyPath: teleportationAreaAccuracy
+      value: 0.1
+      objectReference: {fileID: 0}
     - target: {fileID: 4390491868590911291, guid: 65ef54bab3cdfac408ba48a6abc2e9ea, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 2055559094
