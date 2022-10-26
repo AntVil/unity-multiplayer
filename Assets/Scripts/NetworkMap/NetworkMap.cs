@@ -1,4 +1,6 @@
+using System.Linq;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using System;
 using System.IO;
@@ -8,6 +10,7 @@ using UnityEngine.UI;
 using TMPro;
 using System.Threading;
 using System.Threading.Tasks;
+using Dummiesman;
 
 public class NetworkMap : Unity.Netcode.NetworkBehaviour
 {
@@ -35,7 +38,6 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
     public override void OnNetworkSpawn(){
         Thread updateAllThread = new Thread(this.UpdateAllModelFiles);
         updateAllThread.Start();
-        print("onnetworkspwan done");
     }
 
     public void Update(){
@@ -160,7 +162,18 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
     }
 
     private void UpdateModel(int modelId){
-        print("not implemented model import from file");
+        GameObject loadedObject = new OBJLoader().Load(modelPath + $"model_{modelId}.obj");
+        loadedObject.transform.Rotate(-90, 0, 0);
+
+        // add collision
+        foreach (Transform child in loadedObject.transform){
+            child.gameObject.AddComponent<MeshCollider>();
+        }
+
+        // add backfaces to meshes (adds collision & better rendering at performance cost)
+        foreach(MeshFilter meshFilter in loadedObject.GetComponentsInChildren<MeshFilter>()){
+            meshFilter.mesh.SetIndices(meshFilter.mesh.GetIndices(0).Concat(meshFilter.mesh.GetIndices(0).Reverse()).ToArray(), MeshTopology.Triangles, 0);
+        }
 
         updateAvailableModels[modelId] = false;
     }
@@ -171,7 +184,6 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
             UpdateModelImageFile(i);
             UpdateModelFile(i);
         }
-        print("updateall done");
     }
 
     [Unity.Netcode.ClientRpc]

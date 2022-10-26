@@ -17,13 +17,35 @@ public class NetworkReaction : Unity.Netcode.NetworkBehaviour
     }
 
     public override void OnNetworkSpawn(){
-        //Destroy(GetComponent<NetworkReaction>());
+        
     }
 
     void Update(){
         if(!IsOwner) return;
 
-        if(Input.GetButton("PositiveReaction") || SteamVR_Actions._default.PositiveReaction.GetStateDown(SteamVR_Input_Sources.Any)){
+        bool positiveVR;
+        bool negativeVR;
+        bool positiveKeyboard;
+        bool negativeKeyboard;
+
+        try{
+            positiveVR = SteamVR_Actions._default.PositiveReaction.GetStateDown(SteamVR_Input_Sources.Any);
+            negativeVR = SteamVR_Actions._default.NegativeReaction.GetStateDown(SteamVR_Input_Sources.Any);
+
+        }catch{
+            positiveVR = false;
+            negativeVR = false;
+        }
+
+        try{
+            positiveKeyboard = Input.GetButton("PositiveReaction");
+            negativeKeyboard = Input.GetButton("NegativeReaction");
+        }catch{
+            positiveKeyboard = false;
+            negativeKeyboard = false;
+        }
+
+        if(positiveVR || positiveKeyboard){
             if(!hasSharedPositiveReaction){
                 ShareReactionServerRpc(OwnerClientId, true);
                 hasSharedPositiveReaction = true;
@@ -32,7 +54,7 @@ public class NetworkReaction : Unity.Netcode.NetworkBehaviour
             hasSharedPositiveReaction = false;
         }
 
-        if(Input.GetButton("NegativeReaction") || SteamVR_Actions._default.NegativeReaction.GetStateDown(SteamVR_Input_Sources.Any)){
+        if(negativeVR || negativeKeyboard){
             if(!hasSharedNegativeReaction){
                 ShareReactionServerRpc(OwnerClientId, false);
                 hasSharedNegativeReaction = true;
