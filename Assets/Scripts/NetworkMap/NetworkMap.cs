@@ -218,24 +218,24 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
                 }
             }
 
-            List<float> unique = new List<float>();
+            List<float> uniqueHeight = new List<float>();
             
             for(int i=0;i<xArray.Length;i++){
                 for(int j=0;j<zArray.Length;j++){
                     bool isNew = true;
-                    for(int k=0;k<unique.Count;k++){
-                        if(Math.Abs(unique[k] - topView[i, j]) < teleportationAreaSlopeLimit){
+                    for(int k=0;k<uniqueHeight.Count;k++){
+                        if(Math.Abs(uniqueHeight[k] - topView[i, j]) < teleportationAreaSlopeLimit){
                             isNew = false;
                             break;
                         }
                     }
                     if(isNew){
-                        unique.Add(topView[i, j]);
+                        uniqueHeight.Add(topView[i, j]);
                     }
                 }
             }
 
-            foreach(float height in unique){
+            foreach(float height in uniqueHeight){
                 bool[,] layer = new bool[xArray.Length, zArray.Length];
 
                 for(int i=0;i<xArray.Length;i++){
@@ -266,15 +266,13 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
                                 }
                             }
 
-                            //print(size);
-
                             for(int p=0;p<size;p++){
                                 for(int q=0;q<size;q++){
                                     layer[i+p, j+q] = false;
                                 }
                             }
 
-                            float translation = (size / 2) * teleportationAreaAccuracy;
+                            float translation = (((float)size) * teleportationAreaAccuracy) / 2.0f;
                             float scale = 0.1f * size * teleportationAreaAccuracy;
                             GameObject square = Instantiate(teleportationArea, new Vector3(xArray[i] + translation, height + 0.01f, zArray[j] + translation), Quaternion.identity);
                             square.transform.localScale = new Vector3(scale, scale, scale);
