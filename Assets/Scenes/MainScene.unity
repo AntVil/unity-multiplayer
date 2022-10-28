@@ -14693,6 +14693,10 @@ PrefabInstance:
       propertyPath: m_Radius
       value: 0.25
       objectReference: {fileID: 0}
+    - target: {fileID: 3913886041994262797, guid: 12f5b8a6640d9194797efa005457efcf, type: 3}
+      propertyPath: lookXLimit
+      value: 90
+      objectReference: {fileID: 0}
     - target: {fileID: 3913886042653969693, guid: 12f5b8a6640d9194797efa005457efcf, type: 3}
       propertyPath: m_Name
       value: ReturnHomeText
