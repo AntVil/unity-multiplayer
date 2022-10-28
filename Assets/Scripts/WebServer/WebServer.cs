@@ -268,14 +268,14 @@ public class WebServer : Unity.Netcode.NetworkBehaviour{
     }
 
     private void ConvertIfcFile(string ifcPath, string objPath, int modelId){
-        int threads = 1;
+        int threads = 4;
 
         System.Diagnostics.Process process = new System.Diagnostics.Process();
         System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
         startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
 
         startInfo.FileName = "cmd.exe";
-        startInfo.Arguments = $"/C \"\"{ifcConverter}\" -y -j {threads} --use-element-guids {ifcPath} \"{objPath}\"";
+        startInfo.Arguments = $"/C \"\"{ifcConverter}\" -y -j {threads} --use-element-guids \"{ifcPath}\" \"{objPath}\"";
 
         process.StartInfo = startInfo;
         process.Start();
