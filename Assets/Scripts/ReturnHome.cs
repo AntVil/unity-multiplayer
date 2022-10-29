@@ -39,11 +39,11 @@ public class ReturnHome : MonoBehaviour
                     // return home if counter is full
 
                     // vr
-                    player.transform.position = new Vector3(0, 0, 0);
+                    player.transform.position = new Vector3(8, 0.5f, 0);
 
                     // keyboard
                     characterController.enabled = false;
-                    characterController.transform.position = new Vector3(0, 0, 0);
+                    characterController.transform.position = new Vector3(8, 0.5f, 0);
                     characterController.enabled = true;
 
                     returnHomeCounter = HAS_RETURNED_HOME;
