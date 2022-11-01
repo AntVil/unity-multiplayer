@@ -3467,6 +3467,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cab90c40ab6e48540b863bd64860e39a, type: 3}
+--- !u!1 &431167294 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8165784422832221523, guid: 5d75cc02bbf8e594fb598e513660aad0, type: 3}
+  m_PrefabInstance: {fileID: 1065481928}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &438362640 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7099516284211603965, guid: ecf7a7762e79d0e4ba340a861efb69b0, type: 3}
@@ -10229,6 +10234,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7099516284211603965, guid: ecf7a7762e79d0e4ba340a861efb69b0, type: 3}
   m_PrefabInstance: {fileID: 1175552879}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1462582921 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8165784422832221523, guid: 5d75cc02bbf8e594fb598e513660aad0, type: 3}
+  m_PrefabInstance: {fileID: 1665178466}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1463984378 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4988496768901222, guid: 640e2e58c89e3714881006bd0c5eeabf, type: 3}
@@ -14625,6 +14635,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cab90c40ab6e48540b863bd64860e39a, type: 3}
+--- !u!1 &2114670785 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8165784422832221523, guid: 5d75cc02bbf8e594fb598e513660aad0, type: 3}
+  m_PrefabInstance: {fileID: 587382098}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &2131736652 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7546474712325341518, guid: 5d75cc02bbf8e594fb598e513660aad0, type: 3}
@@ -14811,6 +14826,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4390491868590911289, guid: 65ef54bab3cdfac408ba48a6abc2e9ea, type: 3}
+      propertyPath: Podium0
+      value: 
+      objectReference: {fileID: 1462582921}
+    - target: {fileID: 4390491868590911289, guid: 65ef54bab3cdfac408ba48a6abc2e9ea, type: 3}
+      propertyPath: Podium1
+      value: 
+      objectReference: {fileID: 2114670785}
+    - target: {fileID: 4390491868590911289, guid: 65ef54bab3cdfac408ba48a6abc2e9ea, type: 3}
+      propertyPath: Podium2
+      value: 
+      objectReference: {fileID: 431167294}
     - target: {fileID: 4390491868590911289, guid: 65ef54bab3cdfac408ba48a6abc2e9ea, type: 3}
       propertyPath: texts.Array.size
       value: 3
