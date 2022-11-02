@@ -21,6 +21,7 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
 
     public TextMeshProUGUI[] texts;
     public GameObject[] images;
+    public GameObject[] podiums;
 
     private bool[] updateAvailableModelNames;
     private bool[] updateAvailableModelImages;
@@ -29,10 +30,6 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
     public GameObject teleportationArea;
     public float teleportationAreaAccuracy = 0.25f;
     public float teleportationAreaSlopeLimit = 0.01f;
-
-    public GameObject Podium0;
-    public GameObject Podium1;
-    public GameObject Podium2;
 
     public void Start(){
         client = new WebClient();
@@ -65,8 +62,10 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
         }
 
         for(int i=0;i<updateAvailableModels.Length;i++){
-            if(updateAvailableModels[i]){ UpdatePodiumModel(i); }
-            if(updateAvailableModels[i]){ UpdateModel(i); }
+            if(updateAvailableModels[i]){
+                UpdatePodiumModel(i);
+                UpdateModel(i);
+            }
         }
     }
 
@@ -288,42 +287,38 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
             }
         }
     }
-        public void UpdatePodiumModel(int modelId){
-
+    
+    public void UpdatePodiumModel(int modelId){
         GameObject loadedObject = new OBJLoader().Load(modelPath + $"model_{modelId}.obj");
         loadedObject.transform.Rotate(-90, 0, 0);
 
         // scale element to fit onto podium (counter without distortion)
-            
-            Bounds podiumBounds;
-            podiumBounds = new Bounds(Podium0.transform.position, Vector3.zero);
-            foreach (Renderer renderer in Podium0.GetComponentsInChildren<Renderer>())
-            {
-                podiumBounds.Encapsulate(renderer.bounds);
-            }
+        Bounds podiumBounds;
+        podiumBounds = new Bounds(podiums[modelId].transform.position, Vector3.zero);
+        foreach (Renderer renderer in podiums[modelId].GetComponentsInChildren<Renderer>()){
+            podiumBounds.Encapsulate(renderer.bounds);
+        }
 
-            Bounds bounds;
-            bounds = new Bounds(loadedObject.transform.position, Vector3.zero);
-            foreach (Renderer renderer in loadedObject.GetComponentsInChildren<Renderer>())
-            {
-                bounds.Encapsulate(renderer.bounds);
-            }
-            
-            float scaling = Math.Min(podiumBounds.extents.x / bounds.extents.x, podiumBounds.extents.z / bounds.extents.z);
-            loadedObject.transform.localScale = new Vector3(
-                scaling / transform.localScale.x,
-                scaling / transform.localScale.z,
-                scaling / transform.localScale.y
-            );    
-            
-             // recalculate bounds to center loaded element
-            bounds = new Bounds(loadedObject.transform.position, Vector3.zero);
-            foreach (Renderer renderer in loadedObject.GetComponentsInChildren<Renderer>())
-            {
-                bounds.Encapsulate(renderer.bounds);
-            }
-            loadedObject.transform.position = new Vector3(Podium0.transform.position.x - bounds.center.x, transform.localScale.y + 0.01f, Podium0.transform.position.z - bounds.center.z);
-            loadedObject.transform.parent = Podium0.transform;
+        Bounds bounds;
+        bounds = new Bounds(loadedObject.transform.position, Vector3.zero);
+        foreach (Renderer renderer in loadedObject.GetComponentsInChildren<Renderer>()){
+            bounds.Encapsulate(renderer.bounds);
+        }
+        
+        float scaling = Math.Min(podiumBounds.extents.x / bounds.extents.x, podiumBounds.extents.z / bounds.extents.z);
+        loadedObject.transform.localScale = new Vector3(
+            scaling / transform.localScale.x,
+            scaling / transform.localScale.z,
+            scaling / transform.localScale.y
+        );    
+        
+        // recalculate bounds to center loaded element
+        bounds = new Bounds(loadedObject.transform.position, Vector3.zero);
+        foreach (Renderer renderer in loadedObject.GetComponentsInChildren<Renderer>()){
+            bounds.Encapsulate(renderer.bounds);
+        }
+        loadedObject.transform.position = new Vector3(podiums[modelId].transform.position.x - bounds.center.x, transform.localScale.y + 0.01f, podiums[modelId].transform.position.z - bounds.center.z);
+        loadedObject.transform.parent = podiums[modelId].transform;
     }
 
     public void UpdateAllModelFiles(){
@@ -331,8 +326,6 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
             UpdateModelNameFile(i);
             UpdateModelImageFile(i);
             UpdateModelFile(i);
-            
-            break;
         }
     }
 

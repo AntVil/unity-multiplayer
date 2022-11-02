@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028334, g: 0.22571328, b: 0.3069217, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -14851,6 +14851,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2912414211809110911, guid: 9f8cebf6ad411764fbffcc05dfd7ac62, type: 3}
     - target: {fileID: 4390491868590911289, guid: 65ef54bab3cdfac408ba48a6abc2e9ea, type: 3}
+      propertyPath: podiums.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4390491868590911289, guid: 65ef54bab3cdfac408ba48a6abc2e9ea, type: 3}
       propertyPath: texts.Array.data[0]
       value: 
       objectReference: {fileID: 1220922984}
@@ -14874,6 +14878,18 @@ PrefabInstance:
       propertyPath: images.Array.data[2]
       value: 
       objectReference: {fileID: 1580163861}
+    - target: {fileID: 4390491868590911289, guid: 65ef54bab3cdfac408ba48a6abc2e9ea, type: 3}
+      propertyPath: podiums.Array.data[0]
+      value: 
+      objectReference: {fileID: 1462582921}
+    - target: {fileID: 4390491868590911289, guid: 65ef54bab3cdfac408ba48a6abc2e9ea, type: 3}
+      propertyPath: podiums.Array.data[1]
+      value: 
+      objectReference: {fileID: 2114670785}
+    - target: {fileID: 4390491868590911289, guid: 65ef54bab3cdfac408ba48a6abc2e9ea, type: 3}
+      propertyPath: podiums.Array.data[2]
+      value: 
+      objectReference: {fileID: 431167294}
     - target: {fileID: 4390491868590911289, guid: 65ef54bab3cdfac408ba48a6abc2e9ea, type: 3}
       propertyPath: teleportationAreaAccuracy
       value: 0.1
