@@ -13,6 +13,8 @@ public class SunRotation : MonoBehaviour
     public string date;
     [Range(0.0f, 23.99f)]
     public float hour;
+
+    public bool toogleSystemTime;
     
     public double latitude;
     public double longitude;
@@ -34,6 +36,10 @@ public class SunRotation : MonoBehaviour
     void Update()
     {
         DateTime dateTime = DateTime.Parse($"{date} {(int)hour}:{(int)((hour%1)*60)}");
+
+        if(toogleSystemTime == true){
+             dateTime = DateTime.Now;
+        }
 
         // Convert to UTC
         dateTime = dateTime.ToUniversalTime();
