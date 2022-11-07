@@ -239,6 +239,8 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
                 }
             }
 
+            uniqueHeight.Sort();
+
             foreach(float height in uniqueHeight){
                 bool[,] layer = new bool[xArray.Length, zArray.Length];
 
@@ -276,10 +278,98 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
                                 }
                             }
 
+                            
+                            Vector3 positiveX = new Vector3(xArray[i], height, zArray[j]);
+                            Vector3 positiveZ = new Vector3(xArray[i], height, zArray[j]);
+                            Vector3 negativeX = new Vector3(xArray[i], height, zArray[j]);
+                            Vector3 negativeZ = new Vector3(xArray[i], height, zArray[j]);
+                            
+                            for(int k=0;i + k + size < xArray.Length;k++){
+                                int a = i + k + size;
+                                int b = j + (size / 2);
+                                if(Math.Abs(topView[a, b] - height) >= teleportationAreaSlopeLimit){
+                                    if(topView[a, b] > height){
+                                        positiveX = new Vector3(xArray[a], topView[a, b], zArray[b]);
+                                    }
+                                    break;
+                                }else{
+                                    positiveX = new Vector3(xArray[a], height, zArray[b]);
+                                }
+                            }
+                            for(int k=0;j + k + size < zArray.Length;k++){
+                                int a = i + (size / 2);
+                                int b = j + k + size;
+                                if(Math.Abs(topView[a, b] - height) >= teleportationAreaSlopeLimit){
+                                    if(topView[a, b] > height){
+                                        positiveZ = new Vector3(xArray[a], topView[a, b], zArray[b]);
+                                    }
+                                    break;
+                                }else{
+                                    positiveZ = new Vector3(xArray[a], height, zArray[b]);
+                                }
+                            }
+                            for(int k=0;i + k >= 0;k--){
+                                int a = i + k;
+                                int b = j + (size / 2);
+                                if(Math.Abs(topView[a, b] - height) >= teleportationAreaSlopeLimit){
+                                    if(topView[a, b] > height){
+                                        negativeX = new Vector3(xArray[a], topView[a, b], zArray[b]);
+                                    }
+                                    break;
+                                }else{
+                                    negativeX = new Vector3(xArray[a], height, zArray[b]);
+                                }
+                            }
+                            for(int k=0;j + k >= 0;k--){
+                                int a = i + (size / 2);
+                                int b = j + k;
+                                if(Math.Abs(topView[a, b] - height) >= teleportationAreaSlopeLimit){
+                                    if(topView[a, b] > height){
+                                        negativeZ = new Vector3(xArray[a], topView[a, b], zArray[b]);
+                                    }
+                                    break;
+                                }else{
+                                    negativeZ = new Vector3(xArray[a], height, zArray[b]);
+                                }
+                            }
+
                             float translation = (((float)size) * teleportationAreaAccuracy) / 2.0f;
-                            float scale = 0.1f * size * teleportationAreaAccuracy;
-                            GameObject square = Instantiate(teleportationArea, new Vector3(xArray[i] + translation, height + 0.01f, zArray[j] + translation), Quaternion.identity);
-                            square.transform.localScale = new Vector3(scale, scale, scale);
+                            float x = xArray[i] + translation;
+                            float z = zArray[j] + translation;
+                            float xScale = 0.1f * size * teleportationAreaAccuracy;
+                            float yScale = 0.1f * size * teleportationAreaAccuracy;
+                            float zScale = 0.1f * size * teleportationAreaAccuracy;
+                            float xAngle = 0.0f;
+                            float zAngle = 0.0f;
+                            float y = height;
+                            if(positiveX.y != negativeX.y){
+                                float dy = positiveX.y - negativeX.y;
+                                float dx = positiveX.x - negativeX.x;
+                                double xAngleRad = Math.Atan2(dy, dx);
+
+                                y = Math.Max(y, (dy / dx) * (x - negativeX.x) + negativeX.y);
+
+                                xAngle = (float)(xAngleRad * 180.0 / Math.PI);
+
+                                xScale *= (float)Math.Tan(xAngleRad / 2.0f) + 1.0f;
+                            }
+                            if(positiveZ.y != negativeZ.y){
+                                float dy = positiveZ.y - negativeZ.y;
+                                float dz = positiveZ.z - negativeZ.z;
+                                double zAngleRad = Math.Atan2(dy, dz);
+                                
+                                y = Math.Max(y, (dy / dz) * (z - negativeZ.z) + negativeZ.z);
+                                
+                                zAngle = (float)(zAngleRad * 180.0 / Math.PI);
+                                
+                                zScale *= (float)Math.Tan(zAngleRad / 2.0f) + 1.0f;
+                            }
+                            GameObject square = Instantiate(
+                                teleportationArea,
+                                new Vector3(x, y + 0.01f, z),
+                                Quaternion.Euler(zAngle, 0.0f, xAngle)
+                            );
+                            square.transform.localScale = new Vector3(xScale, yScale, zScale);
                             square.transform.parent = child;
                         }
                     }
