@@ -278,11 +278,10 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
                                 }
                             }
 
-                            
-                            Vector3 positiveX = new Vector3(xArray[i], height, zArray[j]);
-                            Vector3 positiveZ = new Vector3(xArray[i], height, zArray[j]);
-                            Vector3 negativeX = new Vector3(xArray[i], height, zArray[j]);
-                            Vector3 negativeZ = new Vector3(xArray[i], height, zArray[j]);
+                            Vector3 positiveX = new Vector3(xArray[i+size-1], height, zArray[j+size/2]);
+                            Vector3 positiveZ = new Vector3(xArray[i+size/2], height, zArray[j+size-1]);
+                            Vector3 negativeX = new Vector3(xArray[i], height, zArray[j+size/2]);
+                            Vector3 negativeZ = new Vector3(xArray[i+size/2], height, zArray[j]);
                             
                             for(int k=0;i + k + size < xArray.Length;k++){
                                 int a = i + k + size;
@@ -351,19 +350,21 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
 
                                 xAngle = (float)(xAngleRad * 180.0 / Math.PI);
 
-                                xScale *= (float)Math.Tan(xAngleRad / 2.0f) + 1.0f;
+                                xScale *= (float)Math.Abs(Math.Tan(xAngleRad / 2.0f)) + 1.0f;
                             }
+
                             if(positiveZ.y != negativeZ.y){
                                 float dy = positiveZ.y - negativeZ.y;
                                 float dz = positiveZ.z - negativeZ.z;
                                 double zAngleRad = Math.Atan2(dy, dz);
                                 
-                                y = Math.Max(y, (dy / dz) * (z - negativeZ.z) + negativeZ.z);
-                                
-                                zAngle = (float)(zAngleRad * 180.0 / Math.PI);
-                                
-                                zScale *= (float)Math.Tan(zAngleRad / 2.0f) + 1.0f;
+                                y = Math.Max(y, (dy / dz) * (z - negativeZ.z) + negativeZ.y);
+
+                                zAngle = -(float)(zAngleRad * 180.0 / Math.PI);
+
+                                zScale *= (float)Math.Abs(Math.Tan(zAngleRad / 2.0f)) + 1.0f;
                             }
+                            
                             GameObject square = Instantiate(
                                 teleportationArea,
                                 new Vector3(x, y + 0.01f, z),
@@ -412,10 +413,12 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
     }
 
     public void UpdateAllModelFiles(){
+        //return;
         for(int i=0;i<webserver.availableModelsCount;i++){
             UpdateModelNameFile(i);
             UpdateModelImageFile(i);
             UpdateModelFile(i);
+            break;
         }
     }
 
