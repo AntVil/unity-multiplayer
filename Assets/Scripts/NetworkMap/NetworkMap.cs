@@ -184,8 +184,7 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
         foreach (Transform child in loadedObject.transform){
             MeshCollider collider = child.gameObject.AddComponent<MeshCollider>();
 
-            Bounds bounds = new Bounds(child.position, Vector3.zero);
-            bounds.Encapsulate(child.GetComponent<Renderer>().bounds);
+            Bounds bounds = child.GetComponent<Renderer>().bounds;
 
             float[] xArray = new float[(int)Math.Floor(bounds.size.x / teleportationAreaAccuracy)];
             float[] zArray = new float[(int)Math.Floor(bounds.size.z / teleportationAreaAccuracy)];
