@@ -201,6 +201,8 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
                     RaycastHit hit;
                     if(collider.Raycast(new Ray(new Vector3(xArray[i], bounds.max.y + 1, zArray[j]), Vector3.down), out hit, 100)){
                         topView[i, j] = hit.point.y;
+                    }else{
+                        topView[i, j] = 0.0f;
                     }
                 }
             }
@@ -222,9 +224,10 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
             }
 
             List<float> uniqueHeight = new List<float>();
-            
             for(int i=0;i<xArray.Length;i++){
                 for(int j=0;j<zArray.Length;j++){
+                    if(topView[i, j] == 0.0f){ continue; }
+
                     bool isNew = true;
                     for(int k=0;k<uniqueHeight.Count;k++){
                         if(Math.Abs(uniqueHeight[k] - topView[i, j]) < teleportationAreaSlopeLimit){
@@ -237,8 +240,6 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
                     }
                 }
             }
-
-            uniqueHeight.Sort();
 
             foreach(float height in uniqueHeight){
                 bool[,] layer = new bool[xArray.Length, zArray.Length];
@@ -412,12 +413,10 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
     }
 
     public void UpdateAllModelFiles(){
-        //return;
         for(int i=0;i<webserver.availableModelsCount;i++){
             UpdateModelNameFile(i);
             UpdateModelImageFile(i);
             UpdateModelFile(i);
-            break;
         }
     }
 
