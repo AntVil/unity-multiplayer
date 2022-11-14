@@ -39,11 +39,11 @@ public class ReturnHome : MonoBehaviour
                     // return home if counter is full
 
                     // vr
-                    player.transform.position = new Vector3(8, 0.5f, 0);
+                    player.transform.position = new Vector3(0, 0.5f, 0);
 
                     // keyboard
                     characterController.enabled = false;
-                    characterController.transform.position = new Vector3(8, 0.5f, 0);
+                    characterController.transform.position = new Vector3(0, 0.5f, 0);
                     characterController.enabled = true;
 
                     returnHomeCounter = HAS_RETURNED_HOME;
@@ -76,7 +76,7 @@ public class ReturnHome : MonoBehaviour
         {
             if (returnHomeCounter > 0)
             {
-                text.text = $"zurück in {(int)Math.Ceiling(returnHomeSeconds - returnHomeCounter)}";
+                text.text = $"zurÃ¼ck in {(int)Math.Ceiling(returnHomeSeconds - returnHomeCounter)}";
                 SetAlpha(returnHomeCounter / returnHomeSeconds);
             }
             else
@@ -86,7 +86,7 @@ public class ReturnHome : MonoBehaviour
         }
         else
         {
-            text.text = "willkommen zurück";
+            text.text = "willkommen zurÃ¼ck";
             SetAlpha(returnHomeCooldown / returnHomeCooldownSeconds);
         }
     }

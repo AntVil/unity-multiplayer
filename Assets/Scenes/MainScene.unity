@@ -1415,7 +1415,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 99c25a5c53efb444a87f75056a8439c5, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 1e292ead194f60a41aa1683a0c5b1edd, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2916,7 +2916,7 @@ MonoBehaviour:
   m_MaxConnectAttempts: 60
   m_DisconnectTimeoutMS: 30000
   ConnectionData:
-    Address: 127.0.0.1
+    Address: 192.168.178.42
     Port: 7777
     ServerListenAddress: 
   DebugSimulator:
@@ -2934,6 +2934,7 @@ GameObject:
   - component: {fileID: 8888097531529865158}
   - component: {fileID: 8888097531529865159}
   - component: {fileID: 8888097531529865160}
+  - component: {fileID: 8888097531529865162}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -2941,6 +2942,19 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &8888097531529865162
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8888097531529865161}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e1fb7dd92f771c4fa97f260b7bdc94a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Activate: 1
 --- !u!1001 &8996466298089600297
 PrefabInstance:
   m_ObjectHideFlags: 0
