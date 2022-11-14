@@ -167,6 +167,10 @@ MonoBehaviour:
   - {fileID: 1033449890}
   - {fileID: 1217040650}
   - {fileID: 2043404947}
+  modelAreas:
+  - {fileID: 4616040366904524250}
+  - {fileID: 2137041121}
+  - {fileID: 313310420}
   teleportationArea: {fileID: 2912414211809110911, guid: 9f8cebf6ad411764fbffcc05dfd7ac62, type: 3}
   teleportationAreaAccuracy: 0.01
   teleportationAreaSlopeLimit: 0.01
@@ -502,6 +506,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 101189052}
     m_Modifications:
+    - target: {fileID: 79859217052135390, guid: 668242b55fe864b469a4c9dfd06ca4cd, type: 3}
+      propertyPath: m_Name
+      value: Podium2
+      objectReference: {fileID: 0}
+    - target: {fileID: 639337481791119858, guid: 668242b55fe864b469a4c9dfd06ca4cd, type: 3}
+      propertyPath: m_Name
+      value: modelPlacementArea2
+      objectReference: {fileID: 0}
     - target: {fileID: 4616040367127825116, guid: 668242b55fe864b469a4c9dfd06ca4cd, type: 3}
       propertyPath: m_Name
       value: Walk2
@@ -552,6 +564,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 668242b55fe864b469a4c9dfd06ca4cd, type: 3}
+--- !u!1 &313310420 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 639337481791119858, guid: 668242b55fe864b469a4c9dfd06ca4cd, type: 3}
+  m_PrefabInstance: {fileID: 313310419}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &328868261 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7099516284211603965, guid: ecf7a7762e79d0e4ba340a861efb69b0, type: 3}
@@ -2530,6 +2547,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 101189052}
     m_Modifications:
+    - target: {fileID: 79859217052135390, guid: 668242b55fe864b469a4c9dfd06ca4cd, type: 3}
+      propertyPath: m_Name
+      value: Podium1
+      objectReference: {fileID: 0}
+    - target: {fileID: 639337481791119858, guid: 668242b55fe864b469a4c9dfd06ca4cd, type: 3}
+      propertyPath: m_Name
+      value: modelPlacementArea1
+      objectReference: {fileID: 0}
     - target: {fileID: 4616040367127825116, guid: 668242b55fe864b469a4c9dfd06ca4cd, type: 3}
       propertyPath: m_Name
       value: Walk1
@@ -2580,6 +2605,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 668242b55fe864b469a4c9dfd06ca4cd, type: 3}
+--- !u!1 &2137041121 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 639337481791119858, guid: 668242b55fe864b469a4c9dfd06ca4cd, type: 3}
+  m_PrefabInstance: {fileID: 2137041120}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &759363358625152007
 Transform:
   m_ObjectHideFlags: 0
@@ -2676,6 +2706,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 101189052}
     m_Modifications:
+    - target: {fileID: 79859217052135390, guid: 668242b55fe864b469a4c9dfd06ca4cd, type: 3}
+      propertyPath: m_Name
+      value: Podium0
+      objectReference: {fileID: 0}
+    - target: {fileID: 639337481791119858, guid: 668242b55fe864b469a4c9dfd06ca4cd, type: 3}
+      propertyPath: m_Name
+      value: modelPlacementArea0
+      objectReference: {fileID: 0}
     - target: {fileID: 4616040367127825116, guid: 668242b55fe864b469a4c9dfd06ca4cd, type: 3}
       propertyPath: m_Name
       value: Walk0
@@ -2726,6 +2764,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 668242b55fe864b469a4c9dfd06ca4cd, type: 3}
+--- !u!1 &4616040366904524250 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 639337481791119858, guid: 668242b55fe864b469a4c9dfd06ca4cd, type: 3}
+  m_PrefabInstance: {fileID: 4616040366904524249}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7496744513274102323
 PrefabInstance:
   m_ObjectHideFlags: 0

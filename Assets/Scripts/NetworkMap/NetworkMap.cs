@@ -22,6 +22,7 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
     public TextMeshProUGUI[] texts;
     public GameObject[] images;
     public GameObject[] podiums;
+    public GameObject[] modelAreas;
 
     private bool[] updateAvailableModelNames;
     private bool[] updateAvailableModelImages;
@@ -175,7 +176,44 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
 
         GameObject loadedObject = new OBJLoader().Load(modelPath + $"model_{modelId}.obj");
         loadedObject.transform.Rotate(-90, 0, 0);
+        loadedObject.transform.Rotate(0, 0, modelAreas[modelId].transform.rotation.eulerAngles.y);
 
+        loadedObject.transform.localScale = new Vector3(
+            (float)Math.Abs(loadedObject.transform.localScale.x),
+            (float)Math.Abs(loadedObject.transform.localScale.y),
+            (float)Math.Abs(loadedObject.transform.localScale.z)
+        );
+        
+        Bounds modelBounds = new Bounds(loadedObject.transform.position, Vector3.zero);
+        foreach (Renderer renderer in loadedObject.GetComponentsInChildren<Renderer>()){
+            modelBounds.Encapsulate(renderer.bounds);
+        }
+        
+        float xTranslation = 0.0f;
+        float zTranslation = 0.0f;
+        float angle = modelAreas[modelId].transform.rotation.eulerAngles.y;
+        if(Math.Abs(angle) < 0.1){
+            xTranslation = -modelBounds.max.x;
+            zTranslation = -modelBounds.center.z;
+        }else if(Math.Abs(angle - 90) < 0.1){
+            xTranslation = -modelBounds.center.x;
+            zTranslation = -modelBounds.min.z;
+        }else if(Math.Abs(angle - 180) < 0.1){
+            xTranslation = -modelBounds.min.x;
+            zTranslation = -modelBounds.center.z;
+        }else{
+            xTranslation = -modelBounds.center.x;
+            zTranslation = -modelBounds.max.z;
+        }
+        
+        loadedObject.transform.position = new Vector3(
+            modelAreas[modelId].transform.position.x + xTranslation,
+            0.0f,
+            modelAreas[modelId].transform.position.z + zTranslation
+        );
+        
+        loadedObject.transform.parent = modelAreas[modelId].transform;
+        
         // add backfaces to meshes (adds collision & better rendering at performance cost)
         foreach(MeshFilter meshFilter in loadedObject.GetComponentsInChildren<MeshFilter>()){
             meshFilter.mesh.SetIndices(meshFilter.mesh.GetIndices(0).Concat(meshFilter.mesh.GetIndices(0).Reverse()).ToArray(), MeshTopology.Triangles, 0);
@@ -411,6 +449,7 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
     public void UpdatePodiumModel(int modelId){
         GameObject loadedObject = new OBJLoader().Load(modelPath + $"model_{modelId}.obj");
         loadedObject.transform.Rotate(-90, 0, 0);
+        loadedObject.transform.Rotate(0, 0, podiums[modelId].transform.rotation.eulerAngles.y);
 
         // scale element to fit onto podium (counter without distortion)
         Bounds podiumBounds;
