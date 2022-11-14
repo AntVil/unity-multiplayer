@@ -439,6 +439,11 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
         }
         loadedObject.transform.position = new Vector3(podiums[modelId].transform.position.x - bounds.center.x, transform.localScale.y + 0.01f, podiums[modelId].transform.position.z - bounds.center.z);
         loadedObject.transform.parent = podiums[modelId].transform;
+
+        // add collision
+        foreach (Transform child in loadedObject.transform){
+            MeshCollider collider = child.gameObject.AddComponent<MeshCollider>();
+        }
     }
 
     public void UpdateAllModelFiles(){
