@@ -30,8 +30,8 @@ public class NetworkStarter : MonoBehaviour
             {
                 if (ipAddress.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
                 {
-                    //if it is activated, check if unityTransportIPAdress is host IP adress
-                    if (ipAddress.ToString() == unityTransportIPAdress)
+                    //if it is activated, check if unityTransportIPAdress is host IP adress or localhost
+                    if (ipAddress.ToString() == unityTransportIPAdress || unityTransportIPAdress == "127.0.0.1")
                     {
                         IPfound = true;
                         NetworkManager.Singleton.StartHost();
