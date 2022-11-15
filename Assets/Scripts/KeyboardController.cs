@@ -16,6 +16,7 @@ public class KeyboardController : MonoBehaviour
     private float rotationY = 0;
 
     public ReturnHome returnHome;
+    public float autoReturnHomeBelowY = 0.0f;
     
     [HideInInspector]
     public bool canMove = true;
@@ -71,7 +72,7 @@ public class KeyboardController : MonoBehaviour
         }
 
         // teleport home logic
-        if (Input.GetButton("ReturnHome"))
+        if (Input.GetButton("ReturnHome") || transform.position.y < autoReturnHomeBelowY)
         {
             returnHome.StartReturn();
         }

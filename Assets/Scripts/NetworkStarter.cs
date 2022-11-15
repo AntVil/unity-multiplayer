@@ -6,41 +6,36 @@ using Unity.Netcode.Transports.UTP;
 
 public class NetworkStarter : MonoBehaviour
 {
-    public bool Activate;
+    public bool active;
 
-    void Start()
-    {
+    public void Start(){
         StartCoroutine(StartNetwork());
     }
 
-    IEnumerator StartNetwork()
-    {
+    private IEnumerator StartNetwork(){
         yield return new WaitForSeconds(1);
 
-        if (Activate)
-        {
-            //get the ip in Unity Transport
-            var unityTransportIPAdress = NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData.Address.ToString();
+        if(active){
+            // get the ip in Unity Transport
+            string unityTransportIPAdress = NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData.Address.ToString();
 
             // find out own ip address
             string hostName = System.Net.Dns.GetHostName();
             System.Net.IPAddress[] ipAddresses = System.Net.Dns.GetHostAddresses(hostName);
-            var IPfound = false;
-            foreach (System.Net.IPAddress ipAddress in ipAddresses)
-            {
-                if (ipAddress.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
-                {
-                    //if it is activated, check if unityTransportIPAdress is host IP adress or localhost
-                    if (ipAddress.ToString() == unityTransportIPAdress || unityTransportIPAdress == "127.0.0.1")
-                    {
-                        IPfound = true;
+
+            // check if unityTransportIPAdress is host IP adress or localhost
+            bool ipFound = false;
+            foreach(System.Net.IPAddress ipAddress in ipAddresses){
+                if (ipAddress.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork){
+                    if (ipAddress.ToString() == unityTransportIPAdress || unityTransportIPAdress == "127.0.0.1"){
+                        ipFound = true;
                         NetworkManager.Singleton.StartHost();
                         break;
                     }
                 }
             }
-            if (!IPfound)
-            {
+
+            if(!ipFound){
                 NetworkManager.Singleton.StartClient();
             }
         }

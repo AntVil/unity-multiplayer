@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_SkyboxMaterial: {fileID: 2100000, guid: 4612f763d1c2f3c478c9ec82f5055c15, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0.29816666, g: 0.44410062, b: 0.66644907, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -164,9 +164,9 @@ MonoBehaviour:
   - {fileID: 1488603686}
   - {fileID: 1580163861}
   podiums:
-  - {fileID: 1033449890}
-  - {fileID: 1217040650}
-  - {fileID: 2043404947}
+  - {fileID: 1958643812}
+  - {fileID: 1997705777}
+  - {fileID: 203051963}
   modelAreas:
   - {fileID: 4616040366904524250}
   - {fileID: 2137041121}
@@ -494,6 +494,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7a135b1a2cb9c8f488d4dd00c55ab283, type: 3}
+--- !u!1 &203051963 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1797904815396029378, guid: 668242b55fe864b469a4c9dfd06ca4cd, type: 3}
+  m_PrefabInstance: {fileID: 313310419}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &229750534 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4616040367127825119, guid: 668242b55fe864b469a4c9dfd06ca4cd, type: 3}
@@ -1433,11 +1438,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1004335936}
   m_CullTransparentMesh: 1
---- !u!1 &1033449890 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 79859217052135390, guid: 668242b55fe864b469a4c9dfd06ca4cd, type: 3}
-  m_PrefabInstance: {fileID: 4616040366904524249}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1045738609
 GameObject:
   m_ObjectHideFlags: 0
@@ -1780,11 +1780,6 @@ Canvas:
 Transform:
   m_CorrespondingSourceObject: {fileID: 7099516284211603965, guid: ecf7a7762e79d0e4ba340a861efb69b0, type: 3}
   m_PrefabInstance: {fileID: 1142350251}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &1217040650 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 79859217052135390, guid: 668242b55fe864b469a4c9dfd06ca4cd, type: 3}
-  m_PrefabInstance: {fileID: 2137041120}
   m_PrefabAsset: {fileID: 0}
 --- !u!114 &1220922984 stripped
 MonoBehaviour:
@@ -2390,6 +2385,16 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1866151667}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1958643812 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1797904815396029378, guid: 668242b55fe864b469a4c9dfd06ca4cd, type: 3}
+  m_PrefabInstance: {fileID: 4616040366904524249}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1997705777 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1797904815396029378, guid: 668242b55fe864b469a4c9dfd06ca4cd, type: 3}
+  m_PrefabInstance: {fileID: 2137041120}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2011057144
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2455,11 +2460,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ecf7a7762e79d0e4ba340a861efb69b0, type: 3}
---- !u!1 &2043404947 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 79859217052135390, guid: 668242b55fe864b469a4c9dfd06ca4cd, type: 3}
-  m_PrefabInstance: {fileID: 313310419}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2065152912
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2693,6 +2693,10 @@ PrefabInstance:
       propertyPath: lookXLimit
       value: 90
       objectReference: {fileID: 0}
+    - target: {fileID: 3913886041994262797, guid: 12f5b8a6640d9194797efa005457efcf, type: 3}
+      propertyPath: autoReturnHomeBelowY
+      value: -20
+      objectReference: {fileID: 0}
     - target: {fileID: 3913886042653969693, guid: 12f5b8a6640d9194797efa005457efcf, type: 3}
       propertyPath: m_Name
       value: ReturnHomeText
@@ -2916,7 +2920,7 @@ MonoBehaviour:
   m_MaxConnectAttempts: 60
   m_DisconnectTimeoutMS: 30000
   ConnectionData:
-    Address: 192.168.178.42
+    Address: 127.0.0.1
     Port: 7777
     ServerListenAddress: 
   DebugSimulator:
@@ -2954,7 +2958,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e1fb7dd92f771c4fa97f260b7bdc94a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Activate: 1
+  active: 1
 --- !u!1001 &8996466298089600297
 PrefabInstance:
   m_ObjectHideFlags: 0

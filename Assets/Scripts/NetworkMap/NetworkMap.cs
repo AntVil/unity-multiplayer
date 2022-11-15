@@ -43,8 +43,7 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
     }
 
     public override void OnNetworkSpawn(){
-        Thread updateAllThread = new Thread(this.UpdateAllModelFiles);
-        updateAllThread.Start();
+        StartCoroutine(UpdateAllModelFiles());
     }
 
     public void Update(){
@@ -174,6 +173,11 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
     private async void UpdateModel(int modelId){
         updateAvailableModels[modelId] = false;
 
+        // clear loaded model
+        foreach (Transform child in modelAreas[modelId].transform) {
+            GameObject.Destroy(child.gameObject);
+        }
+
         GameObject loadedObject = new OBJLoader().Load(modelPath + $"model_{modelId}.obj");
         loadedObject.transform.Rotate(-90, 0, 0);
         loadedObject.transform.Rotate(0, 0, modelAreas[modelId].transform.rotation.eulerAngles.y);
@@ -213,7 +217,7 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
         );
         
         loadedObject.transform.parent = modelAreas[modelId].transform;
-        
+
         // add backfaces to meshes (adds collision & better rendering at performance cost)
         foreach(MeshFilter meshFilter in loadedObject.GetComponentsInChildren<MeshFilter>()){
             meshFilter.mesh.SetIndices(meshFilter.mesh.GetIndices(0).Concat(meshFilter.mesh.GetIndices(0).Reverse()).ToArray(), MeshTopology.Triangles, 0);
@@ -447,6 +451,11 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
     }
     
     public void UpdatePodiumModel(int modelId){
+        // clear loaded model
+        foreach (Transform child in podiums[modelId].transform) {
+            GameObject.Destroy(child.gameObject);
+        }
+
         GameObject loadedObject = new OBJLoader().Load(modelPath + $"model_{modelId}.obj");
         loadedObject.transform.Rotate(-90, 0, 0);
         loadedObject.transform.Rotate(0, 0, podiums[modelId].transform.rotation.eulerAngles.y);
@@ -485,7 +494,9 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
         }
     }
 
-    public void UpdateAllModelFiles(){
+    public IEnumerator UpdateAllModelFiles(){
+        yield return new WaitForSeconds(1);
+        
         for(int i=0;i<webserver.availableModelsCount;i++){
             UpdateModelNameFile(i);
             UpdateModelImageFile(i);
