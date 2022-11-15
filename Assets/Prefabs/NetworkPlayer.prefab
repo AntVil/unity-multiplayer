@@ -5134,6 +5134,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   frequency: 8000
   channels: 1
+  minAmplitude: 0.01
 --- !u!1 &8131533140285093599
 GameObject:
   m_ObjectHideFlags: 0

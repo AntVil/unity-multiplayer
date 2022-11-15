@@ -5,6 +5,7 @@ public class NetworkVoiceChat : Unity.Netcode.NetworkBehaviour
 {
     public int frequency = 8000;
     public int channels = 1;
+    public float minAmplitude = 0;
 
     private int recordingFrequency;
 
@@ -68,11 +69,26 @@ public class NetworkVoiceChat : Unity.Netcode.NetworkBehaviour
                     // Get the data from microphone.
                     recording.GetData(sample, lastPos);
 
-                    // convert and send data to everybody
-                    ShareAudioServerRpc(
-                        GetNetworkCommonFrequency(sample),
-                        (int)Math.Floor(((float)lastPos) * frequencyFactor)
-                    );
+                    bool isRelevant = false;
+                    for(int i=0;i<sample.Length;i++){
+                        if(Math.Abs(sample[i]) > minAmplitude){
+                            isRelevant = true;
+                            break;
+                        }
+                    }
+
+                    if(isRelevant){
+                        // convert and send data to everybody
+                        ShareAudioServerRpc(
+                            GetNetworkCommonFrequency(sample),
+                            (int)Math.Floor(((float)lastPos) * frequencyFactor)
+                        );
+                    }else{
+                        ShareSilenceServerRpc(
+                            sample.Length,
+                            (int)Math.Floor(((float)lastPos) * frequencyFactor)
+                        );
+                    }
 
                     lastPos = pos;
                 }
@@ -114,5 +130,25 @@ public class NetworkVoiceChat : Unity.Netcode.NetworkBehaviour
 
         if (!audio.isPlaying) audio.Play();
     }
-}
 
+    [Unity.Netcode.ServerRpc]
+    private void ShareSilenceServerRpc(int silenceLength, int lastPos)
+    {
+        if (!IsServer) return;
+
+        ShareSilenceClientRpc(silenceLength, lastPos);
+    }
+
+    [Unity.Netcode.ClientRpc]
+    private void ShareSilenceClientRpc(int silenceLength, int lastPos)
+    {
+        if (IsOwner) return;
+
+        AudioSource audio = GetComponent<AudioSource>();
+
+        // Put empty data in the audio source.
+        audio.clip.SetData(new float[silenceLength], lastPos);
+
+        if (!audio.isPlaying) audio.Play();
+    }
+}
