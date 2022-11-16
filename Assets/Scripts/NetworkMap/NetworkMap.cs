@@ -1,15 +1,12 @@
 using System.Linq;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
 using System.IO;
-using System.Text;
 using System.Net;
 using UnityEngine.UI;
 using TMPro;
 using System.Threading;
-using System.Threading.Tasks;
 using Dummiesman;
 
 public class NetworkMap : Unity.Netcode.NetworkBehaviour
@@ -43,7 +40,8 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
     }
 
     public override void OnNetworkSpawn(){
-        StartCoroutine(UpdateAllModelFiles());
+        Thread updateAllTread = new Thread(this.UpdateAllModelFiles);
+        updateAllTread.Start();
     }
 
     public void Update(){
@@ -170,7 +168,7 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
         updateAvailableModelImages[modelId] = false;
     }
 
-    private async void UpdateModel(int modelId){
+    private void UpdateModel(int modelId){
         updateAvailableModels[modelId] = false;
 
         // clear loaded model
@@ -226,228 +224,14 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
         // add collision & teleportation
         foreach (Transform child in loadedObject.transform){
             MeshCollider collider = child.gameObject.AddComponent<MeshCollider>();
-
-            Bounds bounds = child.GetComponent<Renderer>().bounds;
-
-            float[] xArray = new float[(int)Math.Floor(bounds.size.x / teleportationAreaAccuracy)];
-            float[] zArray = new float[(int)Math.Floor(bounds.size.z / teleportationAreaAccuracy)];
-            for(int i=0;i<xArray.Length;i++){
-                xArray[i] = bounds.min.x + teleportationAreaAccuracy * i;
-            }
-            for(int i=0;i<zArray.Length;i++){
-                zArray[i] = bounds.min.z + teleportationAreaAccuracy * i;
-            }
-
-            // generate heightmap/topview
-            float[,] topView = new float[xArray.Length, zArray.Length];
-            for(int i=0;i<xArray.Length;i++){
-                for(int j=0;j<zArray.Length;j++){
-                    RaycastHit hit;
-                    if(collider.Raycast(new Ray(new Vector3(xArray[i], bounds.max.y + 1, zArray[j]), Vector3.down), out hit, 100)){
-                        topView[i, j] = hit.point.y;
-                    }else{
-                        topView[i, j] = 0.0f;
-                    }
-                }
-            }
-
-            // calculate teleportation area parameters
-            List<Vector3> buffer = await Task.Run(() => {
-                buffer = new List<Vector3>();
-                
-                // remove lonely points
-                for(int i=0;i<xArray.Length;i++){
-                    for(int j=0;j<zArray.Length;j++){
-                        if(topView[i, j] != 0.0f){
-                            int neighbours = 0;
-                            
-                            if(i != 0 && Math.Abs(topView[i-1, j] - topView[i, j]) < teleportationAreaSlopeLimit) neighbours++;
-                            if(j != 0 && Math.Abs(topView[i, j-1] - topView[i, j]) < teleportationAreaSlopeLimit) neighbours++;
-                            if(i != xArray.Length-1 && Math.Abs(topView[i+1, j] - topView[i, j]) < teleportationAreaSlopeLimit) neighbours++;
-                            if(j != zArray.Length-1 && Math.Abs(topView[i, j+1] - topView[i, j]) < teleportationAreaSlopeLimit) neighbours++;
-
-                            if(neighbours == 0) topView[i, j] = 0.0f;
-                        }
-                    }
-                }
-
-                // convert heightmap/topview into layers
-                List<float> uniqueHeight = new List<float>();
-                for(int i=0;i<xArray.Length;i++){
-                    for(int j=0;j<zArray.Length;j++){
-                        if(topView[i, j] == 0.0f){ continue; }
-
-                        bool isNew = true;
-                        for(int k=0;k<uniqueHeight.Count;k++){
-                            if(Math.Abs(uniqueHeight[k] - topView[i, j]) < teleportationAreaSlopeLimit){
-                                isNew = false;
-                                break;
-                            }
-                        }
-                        if(isNew){
-                            uniqueHeight.Add(topView[i, j]);
-                        }
-                    }
-                }
-
-                foreach(float height in uniqueHeight){
-                    bool[,] layer = new bool[xArray.Length, zArray.Length];
-
-                    for(int i=0;i<xArray.Length;i++){
-                        for(int j=0;j<zArray.Length;j++){
-                            layer[i, j] = Math.Abs(topView[i, j] - height) < teleportationAreaSlopeLimit;
-                        }
-                    }
-
-                    for(int i=0;i<xArray.Length;i++){
-                        for(int j=0;j<zArray.Length;j++){
-                            if(layer[i, j]){
-                                // grow square tile as much as possible
-                                int size = 1;
-                                bool extendable = true;
-                                while(extendable){
-                                    if(i + size > xArray.Length-1 || j + size > zArray.Length-1){
-                                        break;
-                                    }
-                                    
-                                    for(int k=0;k<size;k++){
-                                        if(i + k > xArray.Length-1 || j + k > zArray.Length-1 || !layer[i + k, j + size] || !layer[i + size, j + k]){
-                                            extendable = false;
-                                            break;
-                                        }
-                                    }
-
-                                    if(extendable){
-                                        size++;
-                                    }
-                                }
-
-                                for(int p=0;p<size;p++){
-                                    for(int q=0;q<size;q++){
-                                        layer[i+p, j+q] = false;
-                                    }
-                                }
-
-                                // find edge points for angle (& scale)
-                                Vector3 positiveX = new Vector3(xArray[i+size-1], height, zArray[j+size/2]);
-                                Vector3 positiveZ = new Vector3(xArray[i+size/2], height, zArray[j+size-1]);
-                                Vector3 negativeX = new Vector3(xArray[i], height, zArray[j+size/2]);
-                                Vector3 negativeZ = new Vector3(xArray[i+size/2], height, zArray[j]);
-                                
-                                for(int k=0;i + k + size < xArray.Length;k++){
-                                    int a = i + k + size;
-                                    int b = j + (size / 2);
-                                    if(Math.Abs(topView[a, b] - height) >= teleportationAreaSlopeLimit){
-                                        if(topView[a, b] > height){
-                                            positiveX = new Vector3(xArray[a], topView[a, b], zArray[b]);
-                                        }
-                                        break;
-                                    }else{
-                                        positiveX = new Vector3(xArray[a], height, zArray[b]);
-                                    }
-                                }
-                                for(int k=0;j + k + size < zArray.Length;k++){
-                                    int a = i + (size / 2);
-                                    int b = j + k + size;
-                                    if(Math.Abs(topView[a, b] - height) >= teleportationAreaSlopeLimit){
-                                        if(topView[a, b] > height){
-                                            positiveZ = new Vector3(xArray[a], topView[a, b], zArray[b]);
-                                        }
-                                        break;
-                                    }else{
-                                        positiveZ = new Vector3(xArray[a], height, zArray[b]);
-                                    }
-                                }
-                                for(int k=0;i + k >= 0;k--){
-                                    int a = i + k;
-                                    int b = j + (size / 2);
-                                    if(Math.Abs(topView[a, b] - height) >= teleportationAreaSlopeLimit){
-                                        if(topView[a, b] > height){
-                                            negativeX = new Vector3(xArray[a], topView[a, b], zArray[b]);
-                                        }
-                                        break;
-                                    }else{
-                                        negativeX = new Vector3(xArray[a], height, zArray[b]);
-                                    }
-                                }
-                                for(int k=0;j + k >= 0;k--){
-                                    int a = i + (size / 2);
-                                    int b = j + k;
-                                    if(Math.Abs(topView[a, b] - height) >= teleportationAreaSlopeLimit){
-                                        if(topView[a, b] > height){
-                                            negativeZ = new Vector3(xArray[a], topView[a, b], zArray[b]);
-                                        }
-                                        break;
-                                    }else{
-                                        negativeZ = new Vector3(xArray[a], height, zArray[b]);
-                                    }
-                                }
-
-                                // calculate transform information
-                                float translation = (((float)size) * teleportationAreaAccuracy) / 2.0f;
-                                float x = xArray[i] + translation;
-                                float z = zArray[j] + translation;
-                                float xScale = 0.1f * size * teleportationAreaAccuracy;
-                                float yScale = 0.1f * size * teleportationAreaAccuracy;
-                                float zScale = 0.1f * size * teleportationAreaAccuracy;
-                                float xAngle = 0.0f;
-                                float zAngle = 0.0f;
-                                float y = height;
-                                if(positiveX.y != negativeX.y){
-                                    float dy = positiveX.y - negativeX.y;
-                                    float dx = positiveX.x - negativeX.x;
-                                    double xAngleRad = Math.Atan2(dy, dx);
-
-                                    y = Math.Max(y, (dy / dx) * (x - negativeX.x) + negativeX.y);
-
-                                    xAngle = (float)(xAngleRad * 180.0 / Math.PI);
-
-                                    xScale *= (float)Math.Abs(Math.Tan(xAngleRad / 2.0f)) + 1.0f;
-                                }
-
-                                if(positiveZ.y != negativeZ.y){
-                                    float dy = positiveZ.y - negativeZ.y;
-                                    float dz = positiveZ.z - negativeZ.z;
-                                    double zAngleRad = Math.Atan2(dy, dz);
-                                    
-                                    y = Math.Max(y, (dy / dz) * (z - negativeZ.z) + negativeZ.y);
-
-                                    zAngle = -(float)(zAngleRad * 180.0 / Math.PI);
-
-                                    zScale *= (float)Math.Abs(Math.Tan(zAngleRad / 2.0f)) + 1.0f;
-                                }
-                                
-                                if(yScale < teleportationAreaMinSize){
-                                    continue;
-                                }
-
-                                // add position
-                                buffer.Add(new Vector3(x, y + 0.01f, z));
-
-                                // add angle
-                                buffer.Add(new Vector3(zAngle, 0.0f, xAngle));
-
-                                // add scale
-                                buffer.Add(new Vector3(xScale, yScale, zScale));
-                            }
-                        }
-                    }
-                }
-
-                return buffer;
-            });
-
-
-            for(int i=0;i<buffer.Count;i+=3){
-                GameObject square = Instantiate(
-                    teleportationArea,
-                    buffer[i],
-                    Quaternion.Euler(buffer[i + 1].x, buffer[i + 1].y, buffer[i + 1].z)
-                );
-                square.transform.localScale = buffer[i + 2];
-                square.transform.parent = child;
-            }
         }
+
+        TeleportAreaPlacer placer = loadedObject.AddComponent<TeleportAreaPlacer>();
+        placer.teleportationArea = teleportationArea;
+        placer.teleportationAreaAccuracy = teleportationAreaAccuracy;
+        placer.teleportationAreaSlopeLimit = teleportationAreaSlopeLimit;
+        placer.teleportationAreaMinSize = teleportationAreaMinSize;
+        placer.CalculateAreas();
     }
     
     public void UpdatePodiumModel(int modelId){
@@ -494,9 +278,7 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
         }
     }
 
-    public IEnumerator UpdateAllModelFiles(){
-        yield return new WaitForSeconds(1);
-        
+    public void UpdateAllModelFiles(){
         for(int i=0;i<webserver.availableModelsCount;i++){
             UpdateModelNameFile(i);
             UpdateModelImageFile(i);
