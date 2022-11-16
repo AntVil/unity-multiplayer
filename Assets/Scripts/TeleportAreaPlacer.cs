@@ -9,6 +9,7 @@ public class TeleportAreaPlacer : MonoBehaviour
     public float teleportationAreaAccuracy = 0.25f;
     public float teleportationAreaSlopeLimit = 0.01f;
     public float teleportationAreaMinSize = 0.02f;
+    public bool indicesDuplicated;
 
     private Queue<Vector3[]> teleportAreaQueue;
 
@@ -48,14 +49,19 @@ public class TeleportAreaPlacer : MonoBehaviour
 
             // do calculations outside main thread
             await Task.Run(() => {
+                int trianglesLength = triangles.Length;
+                if(indicesDuplicated){
+                    trianglesLength /= 2;
+                }
+
                 // convert verticies to world space
                 for(int i=0;i<vertices.Length;i++){
                     vertices[i] = localToWorld.MultiplyPoint3x4(vertices[i]);
                 }
 
                 // compute normals of triangles
-                Vector3[] normals = new Vector3[triangles.Length];
-                for(int i=0;i<triangles.Length;i+=3){
+                Vector3[] normals = new Vector3[trianglesLength];
+                for(int i=0;i<trianglesLength;i+=3){
                     normals[i/3] = Vector3.Normalize(Vector3.Cross(vertices[triangles[i+1]] - vertices[triangles[i]], vertices[triangles[i+2]] - vertices[triangles[i]]));
                 }
 
@@ -82,7 +88,7 @@ public class TeleportAreaPlacer : MonoBehaviour
                         float y = float.PositiveInfinity;
                         bool isHit = false;
 
-                        for(int k=0;k<triangles.Length;k+=3){
+                        for(int k=0;k<trianglesLength;k+=3){
                             if(Math.Abs(normals[k/3].y) < 0.01) continue;
 
                             Vector3 p0 = vertices[triangles[k]];

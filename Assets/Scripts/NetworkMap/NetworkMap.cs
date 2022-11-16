@@ -7,6 +7,7 @@ using System.Net;
 using UnityEngine.UI;
 using TMPro;
 using System.Threading;
+using System.Threading.Tasks;
 using Dummiesman;
 
 public class NetworkMap : Unity.Netcode.NetworkBehaviour
@@ -168,7 +169,7 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
         updateAvailableModelImages[modelId] = false;
     }
 
-    private void UpdateModel(int modelId){
+    private async void UpdateModel(int modelId){
         updateAvailableModels[modelId] = false;
 
         // clear loaded model
@@ -191,34 +192,40 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
             modelBounds.Encapsulate(renderer.bounds);
         }
         
-        float xTranslation = 0.0f;
-        float zTranslation = 0.0f;
+        Vector3 position = modelAreas[modelId].transform.position;
         float angle = modelAreas[modelId].transform.rotation.eulerAngles.y;
-        if(Math.Abs(angle) < 0.1){
-            xTranslation = -modelBounds.max.x;
-            zTranslation = -modelBounds.center.z;
-        }else if(Math.Abs(angle - 90) < 0.1){
-            xTranslation = -modelBounds.center.x;
-            zTranslation = -modelBounds.min.z;
-        }else if(Math.Abs(angle - 180) < 0.1){
-            xTranslation = -modelBounds.min.x;
-            zTranslation = -modelBounds.center.z;
-        }else{
-            xTranslation = -modelBounds.center.x;
-            zTranslation = -modelBounds.max.z;
-        }
-        
-        loadedObject.transform.position = new Vector3(
-            modelAreas[modelId].transform.position.x + xTranslation,
-            0.0f,
-            modelAreas[modelId].transform.position.z + zTranslation
-        );
+        loadedObject.transform.position = await Task.Run(() => {
+            float xTranslation = 0.0f;
+            float zTranslation = 0.0f;
+
+            if(Math.Abs(angle) < 0.1){
+                xTranslation = -modelBounds.max.x;
+                zTranslation = -modelBounds.center.z;
+            }else if(Math.Abs(angle - 90) < 0.1){
+                xTranslation = -modelBounds.center.x;
+                zTranslation = -modelBounds.min.z;
+            }else if(Math.Abs(angle - 180) < 0.1){
+                xTranslation = -modelBounds.min.x;
+                zTranslation = -modelBounds.center.z;
+            }else{
+                xTranslation = -modelBounds.center.x;
+                zTranslation = -modelBounds.max.z;
+            }
+
+            return new Vector3(
+                position.x + xTranslation, 0.0f, position.z + zTranslation
+            );
+        });
         
         loadedObject.transform.parent = modelAreas[modelId].transform;
 
         // add backfaces to meshes (adds collision & better rendering at performance cost)
         foreach(MeshFilter meshFilter in loadedObject.GetComponentsInChildren<MeshFilter>()){
-            meshFilter.mesh.SetIndices(meshFilter.mesh.GetIndices(0).Concat(meshFilter.mesh.GetIndices(0).Reverse()).ToArray(), MeshTopology.Triangles, 0);
+            int[] indices = meshFilter.mesh.GetIndices(0);
+            indices = await Task.Run(() => {
+                return indices.Concat(indices.Reverse()).ToArray();
+            });
+            meshFilter.mesh.SetIndices(indices, MeshTopology.Triangles, 0);
         }
 
         // add collision & teleportation
@@ -231,6 +238,7 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
         placer.teleportationAreaAccuracy = teleportationAreaAccuracy;
         placer.teleportationAreaSlopeLimit = teleportationAreaSlopeLimit;
         placer.teleportationAreaMinSize = teleportationAreaMinSize;
+        placer.indicesDuplicated = true;
         placer.CalculateAreas();
     }
     
