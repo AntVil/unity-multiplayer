@@ -172,7 +172,7 @@ MonoBehaviour:
   - {fileID: 2137041121}
   - {fileID: 313310420}
   teleportationArea: {fileID: 2912414211809110911, guid: 9f8cebf6ad411764fbffcc05dfd7ac62, type: 3}
-  teleportationAreaAccuracy: 0.05
+  teleportationAreaAccuracy: 0.01
   teleportationAreaSlopeLimit: 0.01
   teleportationAreaMinSize: 0.02
 --- !u!4 &1950658
