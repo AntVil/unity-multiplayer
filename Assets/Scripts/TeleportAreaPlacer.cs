@@ -13,19 +13,19 @@ public class TeleportAreaPlacer : MonoBehaviour
     private Queue<Vector3[]> teleportAreaQueue;
 
     public void Start(){
-        teleportAreaQueue = new Queue<Vector3[]>();
+        
     }
 
     public void Update(){
         for(int i=0;i<10;i++){
-            if(teleportAreaQueue.Count == 0) break;
+            if(teleportAreaQueue == null || teleportAreaQueue.Count == 0) break;
 
             Vector3[] buffer = teleportAreaQueue.Dequeue();
 
             GameObject square = Instantiate(
                 teleportationArea,
                 buffer[0],
-                Quaternion.Euler(buffer[1].x, buffer[1].y, buffer[1].z)
+                Quaternion.Euler(buffer[1])
             );
             square.transform.localScale = buffer[2];
             square.transform.parent = transform;
@@ -33,6 +33,8 @@ public class TeleportAreaPlacer : MonoBehaviour
     }
     
     public async void CalculateAreas(){
+        teleportAreaQueue = new Queue<Vector3[]>();
+
         int childCount = transform.childCount;
 
         // add collision & teleportation
