@@ -288,16 +288,19 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
 
     [Unity.Netcode.ClientRpc]
     public void UpdateModelNameClientRpc(int modelId){
-        UpdateModelNameFile(modelId);
+        Thread updateTread = new Thread(() => UpdateModelNameFile(modelId));
+        updateTread.Start();
     }
 
     [Unity.Netcode.ClientRpc]
     public void UpdateModelImageClientRpc(int modelId){
-        UpdateModelImageFile(modelId);
+        Thread updateTread = new Thread(() => UpdateModelImageFile(modelId));
+        updateTread.Start();
     }
 
     [Unity.Netcode.ClientRpc]
     public void UpdateModelClientRpc(int modelId){
-        UpdateModelFile(modelId);
+        Thread updateTread = new Thread(() => UpdateModelFile(modelId));
+        updateTread.Start();
     }
 }
