@@ -9,7 +9,7 @@ public class TeleportAreaPlacer : MonoBehaviour
     public float teleportationAreaAccuracy = 0.25f;
     public float teleportationAreaSlopeLimit = 0.01f;
     public float teleportationAreaMinSize = 0.02f;
-    public bool indicesDuplicated;
+    public bool indicesDuplicated = false;
 
     private Queue<Vector3[]> teleportAreaQueue;
 
@@ -81,33 +81,101 @@ public class TeleportAreaPlacer : MonoBehaviour
                     zArray[i] = bounds.min.z + teleportationAreaAccuracy * i;
                 }
 
-                // calculate topView/heightmap with topdown raycasting
                 float[,] topView = new float[xArray.Length, zArray.Length];
-                for(int i=0;i<xArray.Length;i++){
-                    for(int j=0;j<zArray.Length;j++){
-                        float y = float.PositiveInfinity;
-                        bool isHit = false;
+                
+                
+                // calculate topView/heightmap with rastering
+                for(int k=0;k<trianglesLength;k+=3){
+                    if(Math.Abs(normals[k/3].y) < 0.01) continue;
 
-                        for(int k=0;k<trianglesLength;k+=3){
-                            if(Math.Abs(normals[k/3].y) < 0.01) continue;
+                    Vector3 p0 = vertices[triangles[k]];
+                    Vector3 p1 = vertices[triangles[k+1]];
+                    Vector3 p2 = vertices[triangles[k+2]];
 
-                            Vector3 p0 = vertices[triangles[k]];
-                            Vector3 p1 = vertices[triangles[k+1]];
-                            Vector3 p2 = vertices[triangles[k+2]];
-                            float s = (p0.x - p2.x) * (zArray[j] - p2.z) - (p0.z - p2.z) * (xArray[i] - p2.x);
-                            float t = (p1.x - p0.x) * (zArray[j] - p0.z) - (p1.z - p0.z) * (xArray[i] - p0.x);
+                    // sort by x
+                    if(p0.x > p1.x) (p0, p1) = (p1, p0);
+                    if(p1.x > p2.x) (p1, p2) = (p2, p1);
+                    if(p0.x > p1.x) (p0, p1) = (p1, p0);
 
-                            if ((s < 0) != (t < 0) && s != 0 && t != 0) continue;
+                    // compute directions
+                    float dz01;
+                    float dz02;
+                    float dz12;
+                    if(Math.Abs(p1.x - p0.x) > 0.01) {
+                        dz01 = (p1.z - p0.z) / (p1.x - p0.x);
+                    }else{
+                        dz01 = 0;
+                    }
+                    if(Math.Abs(p2.x - p0.x) > 0.01) {
+                        dz02 = (p2.z - p0.z) / (p2.x - p0.x);
+                    }else{
+                        dz02 = 0;
+                    }
+                    if(Math.Abs(p2.x - p1.x) > 0.01) {
+                        dz12 = (p2.z - p1.z) / (p2.x - p1.x);
+                    }else{
+                        dz12 = 0;
+                    }
+                    
+                    int startXIndex = (int)Math.Round(Math.Max(0, Math.Min(xArray.Length, (p0.x - bounds.min.x) / teleportationAreaAccuracy)));
+                    int midXIndex = (int)Math.Round(Math.Max(0, Math.Min(xArray.Length, (p1.x - bounds.min.x) / teleportationAreaAccuracy)));
+                    int endXIndex = (int)Math.Round(Math.Max(0, Math.Min(xArray.Length, (p2.x - bounds.min.x) / teleportationAreaAccuracy)));
+                    int startZIndex;
+                    int endZIndex;
+                    
+                    if(p0.z + dz02 * (p1.x - p0.x) < p1.z){
+                        // center point above
+                        for(int i=startXIndex;i<midXIndex;i++){
+                            startZIndex = (int)Math.Round((p0.z + dz02 * (xArray[i] - p0.x) - bounds.min.z) / teleportationAreaAccuracy);
+                            endZIndex = (int)Math.Round((p0.z + dz01 * (xArray[i] - p0.x) - bounds.min.z) / teleportationAreaAccuracy);
 
-                            float d = (p2.x - p1.x) * (zArray[j] - p1.z) - (p2.z - p1.z) * (xArray[i] - p1.x);
-                            if(d == 0 || (d < 0) == (s + t <= 0)){
-                                y = Math.Min(y, (xArray[i] * normals[k/3].x + zArray[j] * normals[k/3].z - Vector3.Dot(normals[k/3], p0)) / normals[k/3].y);
-                                isHit = true;
+                            for(int j=startZIndex;j<endZIndex;j++){
+                                try{
+                                    topView[i, j] = Math.Max(topView[i, j], -(xArray[i] * normals[k/3].x + zArray[j] * normals[k/3].z - Vector3.Dot(normals[k/3], p0)) / normals[k/3].y);
+                                }catch{
+
+                                }
                             }
                         }
-                        
-                        if(isHit){
-                            topView[i, j] = -y;
+
+                        for(int i=midXIndex;i<endXIndex;i++){
+                            startZIndex = (int)Math.Round((p0.z + dz02 * (xArray[i] - p0.x) - bounds.min.z) / teleportationAreaAccuracy);
+                            endZIndex = (int)Math.Round((p1.z + dz12 * (xArray[i] - p1.x) - bounds.min.z) / teleportationAreaAccuracy);
+
+                            for(int j=startZIndex;j<endZIndex;j++){
+                                try{
+                                    topView[i, j] = Math.Max(topView[i, j], -(xArray[i] * normals[k/3].x + zArray[j] * normals[k/3].z - Vector3.Dot(normals[k/3], p0)) / normals[k/3].y);
+                                }catch{
+                                    
+                                }
+                            }
+                        }
+                    }else{
+                        // center point below
+                        for(int i=startXIndex;i<midXIndex;i++){
+                            startZIndex = (int)Math.Round((p0.z + dz01 * (xArray[i] - p0.x) - bounds.min.z) / teleportationAreaAccuracy);
+                            endZIndex = (int)Math.Round((p0.z + dz02 * (xArray[i] - p0.x) - bounds.min.z) / teleportationAreaAccuracy);
+
+                            for(int j=startZIndex;j<endZIndex;j++){
+                                try{
+                                    topView[i, j] = Math.Max(topView[i, j], -(xArray[i] * normals[k/3].x + zArray[j] * normals[k/3].z - Vector3.Dot(normals[k/3], p0)) / normals[k/3].y);
+                                }catch{
+                                    
+                                }
+                            }
+                        }
+
+                        for(int i=midXIndex;i<endXIndex;i++){
+                            startZIndex = (int)Math.Round((p1.z + dz12 * (xArray[i] - p1.x) - bounds.min.z) / teleportationAreaAccuracy);
+                            endZIndex = (int)Math.Round((p0.z + dz02 * (xArray[i] - p0.x) - bounds.min.z) / teleportationAreaAccuracy);
+
+                            for(int j=startZIndex;j<endZIndex;j++){
+                                try{
+                                    topView[i, j] = Math.Max(topView[i, j], -(xArray[i] * normals[k/3].x + zArray[j] * normals[k/3].z - Vector3.Dot(normals[k/3], p0)) / normals[k/3].y);
+                                }catch{
+                                    
+                                }
+                            }
                         }
                     }
                 }
