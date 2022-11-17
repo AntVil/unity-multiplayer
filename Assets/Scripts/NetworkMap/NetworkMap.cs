@@ -242,7 +242,7 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
         placer.CalculateAreas();
     }
     
-    public void UpdatePodiumModel(int modelId){
+    public async void UpdatePodiumModel(int modelId){
         // clear loaded model
         foreach (Transform child in podiums[modelId].transform) {
             GameObject.Destroy(child.gameObject);
@@ -279,6 +279,15 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
         }
         loadedObject.transform.position = new Vector3(podiums[modelId].transform.position.x - bounds.center.x, transform.localScale.y + 0.01f, podiums[modelId].transform.position.z - bounds.center.z);
         loadedObject.transform.parent = podiums[modelId].transform;
+
+        // add backfaces to meshes (adds collision & better rendering at performance cost)
+        foreach(MeshFilter meshFilter in loadedObject.GetComponentsInChildren<MeshFilter>()){
+            int[] indices = meshFilter.mesh.GetIndices(0);
+            indices = await Task.Run(() => {
+                return indices.Concat(indices.Reverse()).ToArray();
+            });
+            meshFilter.mesh.SetIndices(indices, MeshTopology.Triangles, 0);
+        }
 
         // add collision
         foreach (Transform child in loadedObject.transform){
