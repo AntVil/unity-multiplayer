@@ -117,64 +117,48 @@ public class TeleportAreaPlacer : MonoBehaviour
                         dz12 = 0;
                     }
                     
-                    int startXIndex = (int)Math.Round(Math.Max(0, Math.Min(xArray.Length, (p0.x - bounds.min.x) / teleportationAreaAccuracy)));
+                    int startXIndex = (int)Math.Round(Math.Max(0, (p0.x - bounds.min.x) / teleportationAreaAccuracy));
                     int midXIndex = (int)Math.Round(Math.Max(0, Math.Min(xArray.Length, (p1.x - bounds.min.x) / teleportationAreaAccuracy)));
-                    int endXIndex = (int)Math.Round(Math.Max(0, Math.Min(xArray.Length, (p2.x - bounds.min.x) / teleportationAreaAccuracy)));
+                    int endXIndex = (int)Math.Round(Math.Min(xArray.Length, (p2.x - bounds.min.x) / teleportationAreaAccuracy));
                     int startZIndex;
                     int endZIndex;
                     
                     if(p0.z + dz02 * (p1.x - p0.x) < p1.z){
                         // center point above
                         for(int i=startXIndex;i<midXIndex;i++){
-                            startZIndex = (int)Math.Round((p0.z + dz02 * (xArray[i] - p0.x) - bounds.min.z) / teleportationAreaAccuracy);
-                            endZIndex = (int)Math.Round((p0.z + dz01 * (xArray[i] - p0.x) - bounds.min.z) / teleportationAreaAccuracy);
+                            startZIndex = (int)Math.Round(Math.Max(0, (p0.z + dz02 * (xArray[i] - p0.x) - bounds.min.z) / teleportationAreaAccuracy));
+                            endZIndex = (int)Math.Round(Math.Min(zArray.Length, (p0.z + dz01 * (xArray[i] - p0.x) - bounds.min.z) / teleportationAreaAccuracy));
 
                             for(int j=startZIndex;j<endZIndex;j++){
-                                try{
-                                    topView[i, j] = Math.Max(topView[i, j], -(xArray[i] * normals[k/3].x + zArray[j] * normals[k/3].z - Vector3.Dot(normals[k/3], p0)) / normals[k/3].y);
-                                }catch{
-
-                                }
+                                topView[i, j] = Math.Max(topView[i, j], -(xArray[i] * normals[k/3].x + zArray[j] * normals[k/3].z - Vector3.Dot(normals[k/3], p0)) / normals[k/3].y);
                             }
                         }
 
                         for(int i=midXIndex;i<endXIndex;i++){
-                            startZIndex = (int)Math.Round((p0.z + dz02 * (xArray[i] - p0.x) - bounds.min.z) / teleportationAreaAccuracy);
-                            endZIndex = (int)Math.Round((p1.z + dz12 * (xArray[i] - p1.x) - bounds.min.z) / teleportationAreaAccuracy);
+                            startZIndex = (int)Math.Round(Math.Max(0, (p0.z + dz02 * (xArray[i] - p0.x) - bounds.min.z) / teleportationAreaAccuracy));
+                            endZIndex = (int)Math.Round(Math.Min(zArray.Length, (p1.z + dz12 * (xArray[i] - p1.x) - bounds.min.z) / teleportationAreaAccuracy));
 
                             for(int j=startZIndex;j<endZIndex;j++){
-                                try{
-                                    topView[i, j] = Math.Max(topView[i, j], -(xArray[i] * normals[k/3].x + zArray[j] * normals[k/3].z - Vector3.Dot(normals[k/3], p0)) / normals[k/3].y);
-                                }catch{
-                                    
-                                }
+                                topView[i, j] = Math.Max(topView[i, j], -(xArray[i] * normals[k/3].x + zArray[j] * normals[k/3].z - Vector3.Dot(normals[k/3], p0)) / normals[k/3].y);
                             }
                         }
                     }else{
                         // center point below
                         for(int i=startXIndex;i<midXIndex;i++){
-                            startZIndex = (int)Math.Round((p0.z + dz01 * (xArray[i] - p0.x) - bounds.min.z) / teleportationAreaAccuracy);
-                            endZIndex = (int)Math.Round((p0.z + dz02 * (xArray[i] - p0.x) - bounds.min.z) / teleportationAreaAccuracy);
+                            startZIndex = (int)Math.Round(Math.Max(0, (p0.z + dz01 * (xArray[i] - p0.x) - bounds.min.z) / teleportationAreaAccuracy));
+                            endZIndex = (int)Math.Round(Math.Min(zArray.Length, (p0.z + dz02 * (xArray[i] - p0.x) - bounds.min.z) / teleportationAreaAccuracy));
 
                             for(int j=startZIndex;j<endZIndex;j++){
-                                try{
-                                    topView[i, j] = Math.Max(topView[i, j], -(xArray[i] * normals[k/3].x + zArray[j] * normals[k/3].z - Vector3.Dot(normals[k/3], p0)) / normals[k/3].y);
-                                }catch{
-                                    
-                                }
+                                topView[i, j] = Math.Max(topView[i, j], -(xArray[i] * normals[k/3].x + zArray[j] * normals[k/3].z - Vector3.Dot(normals[k/3], p0)) / normals[k/3].y);
                             }
                         }
 
                         for(int i=midXIndex;i<endXIndex;i++){
-                            startZIndex = (int)Math.Round((p1.z + dz12 * (xArray[i] - p1.x) - bounds.min.z) / teleportationAreaAccuracy);
-                            endZIndex = (int)Math.Round((p0.z + dz02 * (xArray[i] - p0.x) - bounds.min.z) / teleportationAreaAccuracy);
+                            startZIndex = (int)Math.Round(Math.Max(0, (p1.z + dz12 * (xArray[i] - p1.x) - bounds.min.z) / teleportationAreaAccuracy));
+                            endZIndex = (int)Math.Round(Math.Min(zArray.Length, (p0.z + dz02 * (xArray[i] - p0.x) - bounds.min.z) / teleportationAreaAccuracy));
 
                             for(int j=startZIndex;j<endZIndex;j++){
-                                try{
-                                    topView[i, j] = Math.Max(topView[i, j], -(xArray[i] * normals[k/3].x + zArray[j] * normals[k/3].z - Vector3.Dot(normals[k/3], p0)) / normals[k/3].y);
-                                }catch{
-                                    
-                                }
+                                topView[i, j] = Math.Max(topView[i, j], -(xArray[i] * normals[k/3].x + zArray[j] * normals[k/3].z - Vector3.Dot(normals[k/3], p0)) / normals[k/3].y);
                             }
                         }
                     }
