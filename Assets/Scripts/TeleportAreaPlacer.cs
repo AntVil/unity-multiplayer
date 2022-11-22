@@ -82,7 +82,11 @@ public class TeleportAreaPlacer : MonoBehaviour
                 }
 
                 float[,] topView = new float[xArray.Length, zArray.Length];
-                
+                for(int i=0;i<xArray.Length;i++){
+                    for(int j=0;j<zArray.Length;j++){
+                        topView[i, j] = float.NegativeInfinity;
+                    }
+                }
                 
                 // calculate topView/heightmap with rastering
                 for(int k=0;k<trianglesLength;k+=3){
@@ -167,7 +171,7 @@ public class TeleportAreaPlacer : MonoBehaviour
                 // remove lonely points
                 for(int i=0;i<xArray.Length;i++){
                     for(int j=0;j<zArray.Length;j++){
-                        if(topView[i, j] != 0.0f){
+                        if(!float.IsNegativeInfinity(topView[i, j])){
                             int neighbours = 0;
                             
                             if(i != 0 && Math.Abs(topView[i-1, j] - topView[i, j]) < teleportationAreaSlopeLimit) neighbours++;
@@ -175,7 +179,7 @@ public class TeleportAreaPlacer : MonoBehaviour
                             if(i != xArray.Length-1 && Math.Abs(topView[i+1, j] - topView[i, j]) < teleportationAreaSlopeLimit) neighbours++;
                             if(j != zArray.Length-1 && Math.Abs(topView[i, j+1] - topView[i, j]) < teleportationAreaSlopeLimit) neighbours++;
 
-                            if(neighbours == 0) topView[i, j] = 0.0f;
+                            if(neighbours == 0) topView[i, j] = float.NegativeInfinity;
                         }
                     }
                 }
@@ -184,7 +188,7 @@ public class TeleportAreaPlacer : MonoBehaviour
                 List<float> uniqueHeight = new List<float>();
                 for(int i=0;i<xArray.Length;i++){
                     for(int j=0;j<zArray.Length;j++){
-                        if(topView[i, j] == 0.0f){ continue; }
+                        if(float.IsNegativeInfinity(topView[i, j])){ continue; }
 
                         bool isNew = true;
                         for(int k=0;k<uniqueHeight.Count;k++){
