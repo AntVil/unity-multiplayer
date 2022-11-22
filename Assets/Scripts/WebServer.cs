@@ -27,9 +27,9 @@ public class WebServer : Unity.Netcode.NetworkBehaviour{
     private HttpListener listener;
     private bool runningWebServer;
 
-    public string contentPath = "./Assets/Scripts/WebServer/content/";
-    public string modelPath = "./Assets/Scripts/WebServer/models/";
-    public string ifcConverter = "./Assets/Scripts/WebServer/ifcConvert.exe";
+    private string contentPath = $"{Application.streamingAssetsPath}/WebServer/content/";
+    private string modelPath = $"{Application.streamingAssetsPath}/WebServer/models/";
+    private string ifcConverter = $"{Application.streamingAssetsPath}/WebServer/ifcConvert.exe";
 
     private Thread serverThread;
 

@@ -154,7 +154,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   webserver: {fileID: 109051296}
-  modelPath: ./Assets/Scripts/NetworkMap/models/
   texts:
   - {fileID: 1220922984}
   - {fileID: 1488603687}
@@ -408,9 +407,6 @@ MonoBehaviour:
   networkMap: {fileID: 1950657}
   port: 8888
   availableModelsCount: 3
-  contentPath: ./Assets/Scripts/WebServer/content/
-  modelPath: ./Assets/Scripts/WebServer/models/
-  ifcConverter: ./Assets/Scripts/WebServer/ifcConvert.exe
 --- !u!114 &109051297
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
@@ -15,7 +16,7 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
     public WebServer webserver;
     public WebClient client;
 
-    public string modelPath = "./Assets/Scripts/NetworkMap/models/";
+    private string modelPath = $"{Application.streamingAssetsPath}/NetworkMap/models/";
 
     public TextMeshProUGUI[] texts;
     public GameObject[] images;
@@ -41,8 +42,7 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
     }
 
     public override void OnNetworkSpawn(){
-        Thread updateAllTread = new Thread(this.UpdateAllModelFiles);
-        updateAllTread.Start();
+        StartCoroutine(UpdateAllModelFiles());
     }
 
     public void Update(){
@@ -295,7 +295,9 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
         }
     }
 
-    public void UpdateAllModelFiles(){
+    private IEnumerator UpdateAllModelFiles(){
+        yield return new WaitForSeconds(1);
+
         for(int i=0;i<webserver.availableModelsCount;i++){
             UpdateModelNameFile(i);
             UpdateModelImageFile(i);
