@@ -42,7 +42,7 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
     }
 
     public override void OnNetworkSpawn(){
-        StartCoroutine(UpdateAllModelFiles());
+        UpdateAllModelFiles();
     }
 
     public void Update(){
@@ -295,31 +295,28 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
         }
     }
 
-    private IEnumerator UpdateAllModelFiles(){
-        yield return new WaitForSeconds(1);
+    private async void UpdateAllModelFiles(){
+        await Task.Delay(100);
 
         for(int i=0;i<webserver.availableModelsCount;i++){
-            UpdateModelNameFile(i);
-            UpdateModelImageFile(i);
-            UpdateModelFile(i);
+            await Task.Run(() => UpdateModelNameFile(i));
+            await Task.Run(() => UpdateModelImageFile(i));
+            await Task.Run(() => UpdateModelFile(i));
         }
     }
 
     [Unity.Netcode.ClientRpc]
     public void UpdateModelNameClientRpc(int modelId){
-        Thread updateTread = new Thread(() => UpdateModelNameFile(modelId));
-        updateTread.Start();
+        Task.Run(() => UpdateModelNameFile(modelId));
     }
 
     [Unity.Netcode.ClientRpc]
     public void UpdateModelImageClientRpc(int modelId){
-        Thread updateTread = new Thread(() => UpdateModelImageFile(modelId));
-        updateTread.Start();
+        Task.Run(() => UpdateModelImageFile(modelId));
     }
 
     [Unity.Netcode.ClientRpc]
     public void UpdateModelClientRpc(int modelId){
-        Thread updateTread = new Thread(() => UpdateModelFile(modelId));
-        updateTread.Start();
+        Task.Run(() => UpdateModelFile(modelId));
     }
 }
