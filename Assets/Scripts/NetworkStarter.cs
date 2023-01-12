@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
+using System.Net.NetworkInformation;
+using System.Linq;
 
 public class NetworkStarter : MonoBehaviour
 {
@@ -16,6 +18,11 @@ public class NetworkStarter : MonoBehaviour
         yield return new WaitForSeconds(1);
 
         if(active){
+
+        	Debug.Log(VariableStorage.isHost);
+            Debug.Log(VariableStorage.validIP);
+            Debug.Log(VariableStorage.validUsername);
+
             // get the ip in Unity Transport
             string unityTransportIPAdress = NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData.Address.ToString();
 
