@@ -76,8 +76,6 @@
                 display: grid;
                 grid-template-columns: 1fr 1fr 1fr;
                 align-items: center;
-                /*padding: 15px;
-                gap: 15px;*/
             }
 
             nav>section{
@@ -152,7 +150,7 @@
             let currentModel = 0;
 
             async function login(){
-                const options = { method: 'POST' };
+                const options = { method: "POST" };
 
                 password = document.getElementById("password").value;
 
@@ -174,9 +172,9 @@
                 // reload images
                 await Promise.all(
                     [
-                        fetch("/getModelImage/0", { cache: 'reload', mode: 'no-cors' }),
-                        fetch("/getModelImage/1", { cache: 'reload', mode: 'no-cors' }),
-                        fetch("/getModelImage/2", { cache: 'reload', mode: 'no-cors' })
+                        fetch("/getModelImage/0", { cache: "reload", mode: "no-cors" }),
+                        fetch("/getModelImage/1", { cache: "reload", mode: "no-cors" }),
+                        fetch("/getModelImage/2", { cache: "reload", mode: "no-cors" })
                     ]
                 )
 
@@ -189,13 +187,15 @@
             }
 
             function loadModel(id){
-                document.getElementById('modelName').value = document.getElementById(`modelName${id}`).innerText;
+                document.getElementById("modelName").value = document.getElementById(`modelName${id}`).innerText;
 
-                document.getElementById('modelImage').parentElement.children[1].innerText = 'Bild-Datei Auswählen (.png)';
-                document.getElementById('modelModel').parentElement.children[1].innerText = 'Modell-Datei Auswählen (.ifc)';
+                document.getElementById("modelImage").parentElement.children[1].innerText = "Bild-Datei Auswählen (.png)";
+                document.getElementById("modelModel").parentElement.children[1].innerText = "Modell-Datei Auswählen (.ifc)";
 
-                document.getElementById('modelImage').ariaFiles = [''];
-                document.getElementById('modelModel').ariaFiles = [''];
+                document.getElementById("modelImage").ariaFiles = [""];
+                document.getElementById("modelModel").ariaFiles = [""];
+                document.getElementById("modelImage").value = "";
+                document.getElementById("modelModel").value = "";
 
                 currentModel = id;
 
@@ -208,13 +208,13 @@
                 let file = e.dataTransfer.items[0].getAsFile();
 
                 let target = e.target;
-                if(target.nodeName.toLowerCase() !== 'div'){
+                if(target.nodeName.toLowerCase() !== "div"){
                     target = target.parentElement;
                 }
 
-                let ext = file.name.split('.')[1];
+                let ext = file.name.split(".")[1];
                 if(target.children[0].accept.includes(ext)){
-                    target.children[0].value = '';
+                    target.children[0].value = "";
                     target.children[0].ariaFiles = [file];
                     target.children[1].innerText = file.name;
                 }
@@ -238,8 +238,8 @@
 
             async function uploadModelName(){
                 const options = {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/octet-stream'},
+                    method: "POST",
+                    headers: { "Content-Type": "application/octet-stream" },
                     body: document.getElementById("modelName").value
                 };
 
@@ -254,8 +254,8 @@
 
                 if(file !== undefined && file !== null && file !== ""){
                     const options = {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/octet-stream'},
+                        method: "POST",
+                        headers: { "Content-Type": "application/octet-stream" },
                         body: file
                     };
 
@@ -271,8 +271,8 @@
                 
                 if(file !== undefined && file !== null && file !== ""){
                     const options = {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/octet-stream'},
+                        method: "POST",
+                        headers: { "Content-Type": "application/octet-stream" },
                         body: file
                     };
 
@@ -311,14 +311,14 @@
             <form onsubmit="return false">
                 <input id="modelName" />
 
-                <div class='dropZone' ondrop='dropHandler(event);' ondragover='dragHandler(event)'>
-                    <input id='modelImage' type='file' accept='.png' onchange='this.parentElement.children[1].innerText=this.files[0].name' ariaFiles='['']' />
-                    <label for='modelImage'></label>
+                <div class="dropZone" ondrop="dropHandler(event)" ondragover="dragHandler(event)">
+                    <input id="modelImage" type="file" accept=".png" onchange="this.parentElement.children[1].innerText=this.files[0].name" ariaFiles="['']" />
+                    <label for="modelImage"></label>
                 </div>
 
-                <div class='dropZone' ondrop='dropHandler(event);' ondragover='dragHandler(event)'>
-                    <input id='modelModel' type='file' accept='.ifc' onchange='this.parentElement.children[1].innerText=this.files[0].name' ariaFiles='['']' />
-                    <label for='modelModel'></label>
+                <div class="dropZone" ondrop="dropHandler(event)" ondragover="dragHandler(event)">
+                    <input id="modelModel" type="file" accept=".ifc" onchange="this.parentElement.children[1].innerText=this.files[0].name" ariaFiles="['']" />
+                    <label for="modelModel"></label>
                 </div>
 
                 <button onclick="loadNav()">Abbrechen</button>
