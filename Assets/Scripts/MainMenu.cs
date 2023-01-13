@@ -3,16 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Net;
-using System.Net.NetworkInformation;
-using System.Linq;
-using System.Net.Sockets;
+
 
 public class MainMenu : MonoBehaviour
 {
     //This script handles all the UI elements logic in the main menu
     public GameObject UserNameHost;
     public GameObject UserNameJoin;
-    public GameObject HostnameFild;
+    public GameObject HostnameFildJoin;
+    public GameObject HostnameFildHost;
     private string validIP;
     private string validUsername;
     public void HostGame()
@@ -41,28 +40,55 @@ public class MainMenu : MonoBehaviour
             username = "Host";
         }
 
-        // find out own ip address
-        string hostName = System.Net.Dns.GetHostName();
-        foreach (IPAddress ip in Dns.GetHostAddresses(hostName))
+        //get text from Hostnameimput field
+        string fildIP = HostnameFildHost.GetComponent<UnityEngine.UI.InputField>().text;
+
+
+        if (System.Text.RegularExpressions.Regex.IsMatch(fildIP, @"^([0-9]{1,3}\.){3}[0-9]{1,3}$"))
         {
-            //find out if it is ipv4 and print it in console (ipv6 gets ignored)
-            if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+            Debug.Log("fildIP is an IPv4 Address");
+            //check if the ip adress is own ip adress
+            //find out own ip addresses
+            string hostName = System.Net.Dns.GetHostName();
+
+            try
             {
-                Debug.Log("ipv4 found");
-                validIP = ip.ToString();
+                foreach (IPAddress ip in Dns.GetHostAddresses(hostName))
+                {
+                    if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                    {
+                        if (ip.ToString() == fildIP || fildIP == "127.0.0.1")
+                        {
+                            validIP = fildIP;
+                            break;
+                        }
+                    }
+                }
+                if (validIP == null)
+                {
+                    HostnameFildHost.GetComponent<UnityEngine.UI.InputField>().image.color = Color.red;
+                }
             }
-            else
+            catch (System.Exception)
             {
-                Debug.Log("ipv4 not found defaulting to localhost");
-                validIP = "127.0.0.1";
+                HostnameFildHost.GetComponent<UnityEngine.UI.InputField>().image.color = Color.red;
             }
         }
+        else
+        {
+            Debug.Log("HostnameOrIP is not an IPv4 Address");
+            HostnameFildHost.GetComponent<UnityEngine.UI.InputField>().image.color = Color.red;
+        }
 
-        //the username and isHost is now stored in the VariableStorage class this is needed to transfer the data to the next scene
-        VariableStorage.isHost = true;
-        VariableStorage.validUsername = validUsername;
-        VariableStorage.validIP = validIP;
-        SceneManager.LoadScene("MainScene");
+
+        if (validIP != null)
+        {
+            //the username and isHost is now stored in the VariableStorage class this is needed to transfer the data to the next scene
+            VariableStorage.isHost = true;
+            VariableStorage.validIP = validIP;
+            VariableStorage.validUsername = validUsername;
+            SceneManager.LoadScene("MainScene");
+        }
     }
 
     public void JoinGame()
@@ -92,7 +118,7 @@ public class MainMenu : MonoBehaviour
         }
 
         //get text from Hostnameimput field
-        string HostnameOrIP = HostnameFild.GetComponent<UnityEngine.UI.InputField>().text;
+        string HostnameOrIP = HostnameFildJoin.GetComponent<UnityEngine.UI.InputField>().text;
 
         //check if HostnameOrIP is an IPv4 Address
         if (System.Text.RegularExpressions.Regex.IsMatch(HostnameOrIP, @"^([0-9]{1,3}\.){3}[0-9]{1,3}$"))
@@ -106,28 +132,37 @@ public class MainMenu : MonoBehaviour
             //check if DNS gives entry for HostnameOrIP
 
             //get all ip addresses of the host
-            foreach (IPAddress ip in Dns.GetHostAddresses(HostnameOrIP))
+            try
             {
-                //find out if it is ipv4 and print it in console (ipv6 gets ignored)
-                if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                foreach (IPAddress ip in Dns.GetHostAddresses(HostnameOrIP))
                 {
-                    Debug.Log("ipv4 found");
-                    validIP = HostnameOrIP;
+                    //find out if it is ipv4 and print it in console (ipv6 gets ignored)
+                    if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                    {
+                        Debug.Log("ipv4 found");
+                        validIP = HostnameOrIP;
+                    }
                 }
-                else
+                if(validIP == null)
                 {
-                    Debug.Log("ipv4 not found defaulting to localhost");
-                    validIP = "127.0.0.1";
+                    HostnameFildJoin.GetComponent<UnityEngine.UI.InputField>().image.color = Color.red;
                 }
-
+            }
+            catch (System.Exception)
+            {
+                Debug.Log("HostnameOrIP is not a valid Hostname or IP");
+                HostnameFildJoin.GetComponent<UnityEngine.UI.InputField>().image.color = Color.red;
             }
 
         }
-        //the valid ip und the valid username are now stored in the VariableStorage class this is needed to transfer the data to the next scene
-        VariableStorage.isHost = false;
-        VariableStorage.validIP = validIP;
-        VariableStorage.validUsername = validUsername;
-        SceneManager.LoadScene("MainScene");
+        if (validIP != null)
+        {
+            //the valid ip und the valid username are now stored in the VariableStorage class this is needed to transfer the data to the next scene
+            VariableStorage.isHost = false;
+            VariableStorage.validIP = validIP;
+            VariableStorage.validUsername = validUsername;
+            SceneManager.LoadScene("MainScene");
+        }
     }
     public void QuitGame()
     {

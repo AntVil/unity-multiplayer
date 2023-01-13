@@ -10,42 +10,36 @@ public class NetworkStarter : MonoBehaviour
 {
     public bool active;
 
-    public void Start(){
+    public void Start()
+    {
         StartCoroutine(StartNetwork());
     }
 
-    private IEnumerator StartNetwork(){
+    private IEnumerator StartNetwork()
+    {
         yield return new WaitForSeconds(1);
 
-        if(active){
+        if (active)
+        {
 
-        	Debug.Log(VariableStorage.isHost);
+            Debug.Log(VariableStorage.isHost);
             Debug.Log(VariableStorage.validIP);
             Debug.Log(VariableStorage.validUsername);
 
-            // get the ip in Unity Transport
-            string unityTransportIPAdress = NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData.Address.ToString();
-
-            // find out own ip address
-            string hostName = System.Net.Dns.GetHostName();
-            System.Net.IPAddress[] ipAddresses = System.Net.Dns.GetHostAddresses(hostName);
-
-            // check if unityTransportIPAdress is host IP adress or localhost
-            bool ipFound = false;
-            foreach(System.Net.IPAddress ipAddress in ipAddresses){
-                if (ipAddress.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork){
-                    if (ipAddress.ToString() == unityTransportIPAdress || unityTransportIPAdress == "127.0.0.1"){
-                        ipFound = true;
-                        NetworkManager.Singleton.StartHost();
-                        break;
-                    }
-                }
+            if (VariableStorage.isHost)
+            {
+                Debug.Log("Start as host");
+                NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData.Address = VariableStorage.validIP;
+                NetworkManager.Singleton.StartHost();
             }
-
-            if(!ipFound){
+            if (VariableStorage.isHost == false)
+            {
+                Debug.Log("Start as client");
+                NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData.Address = VariableStorage.validIP;
                 NetworkManager.Singleton.StartClient();
             }
         }
     }
 }
+
 
