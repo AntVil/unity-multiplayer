@@ -84,6 +84,8 @@ public class WebServer : Unity.Netcode.NetworkBehaviour{
             if(req.HttpMethod == "GET"){
                 if(urlPath.Count == 0 || urlPath[0] == "index.html"){
                     SendWebpage(res);
+                }else if(urlPath[0] == "icon.svg"){
+                    SendIcon(res);
                 }else if(urlPath[0] == "getModelName"){
                     SendModelName(urlPath, res);
                 }else if(urlPath[0] == "getModelImage"){
@@ -117,7 +119,6 @@ public class WebServer : Unity.Netcode.NetworkBehaviour{
 
     private void SendResponse(HttpListenerResponse res, string contentType, byte[] rawdata){
         res.ContentType = contentType;
-        //res.ContentEncoding = Encoding.UTF8;
         res.ContentLength64 = rawdata.LongLength;
         res.OutputStream.Write(rawdata, 0, rawdata.Length);
         res.Close();
@@ -138,6 +139,10 @@ public class WebServer : Unity.Netcode.NetworkBehaviour{
 
     private void SendWebpage(HttpListenerResponse res){
         SendResponse(res, "text/html", File.ReadAllText(Path.GetFullPath(contentPath + "index.html")));
+    }
+
+    private void SendIcon(HttpListenerResponse res){
+        SendResponse(res, "image/svg+xml", File.ReadAllText(Path.GetFullPath(contentPath + "icon.svg")));
     }
 
     private void SendModelName(List<string> urlPath, HttpListenerResponse res){
@@ -290,21 +295,36 @@ public class WebServer : Unity.Netcode.NetworkBehaviour{
         updateAvailableModels[modelId] = true;
     }
 
-    public bool[] GetUpdateAvailableModelNames(){
-        bool[] result = updateAvailableModelNames;
-        updateAvailableModelNames = new bool[result.Length];
+    public List<int> GetUpdateAvailableModelNames(){
+        List<int> result = new List<int>();
+        for(int i=0;i<updateAvailableModelNames.Length;i++){
+            if(updateAvailableModelNames[i]){
+                result.Add(i);
+                updateAvailableModelNames[i] = false;
+            }
+        }
         return result;
     }
 
-    public bool[] GetUpdateAvailableModelImages(){
-        bool[] result = updateAvailableModelImages;
-        updateAvailableModelImages = new bool[result.Length];
+    public List<int> GetUpdateAvailableModelImages(){
+        List<int> result = new List<int>();
+        for(int i=0;i<updateAvailableModelImages.Length;i++){
+            if(updateAvailableModelImages[i]){
+                result.Add(i);
+                updateAvailableModelImages[i] = false;
+            }
+        }
         return result;
     }
 
-    public bool[] GetUpdateAvailableModels(){
-        bool[] result = updateAvailableModels;
-        updateAvailableModels = new bool[result.Length];
+    public List<int> GetUpdateAvailableModels(){
+        List<int> result = new List<int>();
+        for(int i=0;i<updateAvailableModels.Length;i++){
+            if(updateAvailableModels[i]){
+                result.Add(i);
+                updateAvailableModels[i] = false;
+            }
+        }
         return result;
     }
 

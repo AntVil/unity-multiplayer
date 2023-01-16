@@ -52,37 +52,59 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
         UpdateClient();
     }
 
+    public void UpdateServer(){
+        // inform clients about updates
+        foreach(int modelId in webserver.GetUpdateAvailableModelNames()){
+            UpdateModelNameClientRpc(modelId);
+        }
+        foreach(int modelId in webserver.GetUpdateAvailableModelImages()){
+            UpdateModelImageClientRpc(modelId);
+        }
+        foreach(int modelId in webserver.GetUpdateAvailableModels()){
+            UpdateModelClientRpc(modelId);
+        }
+    }
+
+    [Unity.Netcode.ClientRpc]
+    public void UpdateModelNameClientRpc(int modelId){
+        Task.Run(() => UpdateModelNameFile(modelId));
+    }
+
+    [Unity.Netcode.ClientRpc]
+    public void UpdateModelImageClientRpc(int modelId){
+        Task.Run(() => UpdateModelImageFile(modelId));
+    }
+
+    [Unity.Netcode.ClientRpc]
+    public void UpdateModelClientRpc(int modelId){
+        Task.Run(() => UpdateModelFile(modelId));
+    }
+
+    private async void UpdateAllModelFiles(){
+        await Task.Delay(100);
+
+        for(int i=0;i<webserver.availableModelsCount;i++){
+            await Task.Run(() => UpdateModelNameFile(i));
+            await Task.Run(() => UpdateModelImageFile(i));
+            await Task.Run(() => UpdateModelFile(i));
+        }
+    }
+
     public void UpdateClient(){
+        // import model when new model available
         for(int i=0;i<updateAvailableModelNames.Length;i++){
-            if(updateAvailableModelNames[i]){ UpdateModelName(i); }
+            if(updateAvailableModelNames[i]){ ImportModelName(i); }
         }
 
         for(int i=0;i<updateAvailableModelImages.Length;i++){
-            if(updateAvailableModelImages[i]){ UpdateModelImage(i); }
+            if(updateAvailableModelImages[i]){ ImportModelImage(i); }
         }
 
         for(int i=0;i<updateAvailableModels.Length;i++){
             if(updateAvailableModels[i]){
-                UpdatePodiumModel(i);
-                UpdateModel(i);
+                ImportPodiumModel(i);
+                ImportModel(i);
             }
-        }
-    }
-
-    public void UpdateServer(){
-        bool[] names = webserver.GetUpdateAvailableModelNames();
-        for(int i=0;i<names.Length;i++){
-            if(names[i]){ UpdateModelNameClientRpc(i); }
-        }
-        
-        bool[] images = webserver.GetUpdateAvailableModelImages();
-        for(int i=0;i<images.Length;i++){
-            if(images[i]){ UpdateModelImageClientRpc(i); }
-        }
-        
-        bool[] models = webserver.GetUpdateAvailableModels();
-        for(int i=0;i<models.Length;i++){
-            if(models[i]){ UpdateModelClientRpc(i); }
         }
     }
 
@@ -141,14 +163,14 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
         updateAvailableModels[modelId] = true;
     }
     
-    private void UpdateModelName(int modelId){
+    private void ImportModelName(int modelId){
         texts[modelId].text = File.ReadAllText(
             Path.GetFullPath(modelPath + $"model_{modelId}.txt")
         );
         updateAvailableModelNames[modelId] = false;
     }
 
-    private void UpdateModelImage(int modelId){
+    private void ImportModelImage(int modelId){
         // load image
         Texture2D tex = new Texture2D(2, 2);
         tex.LoadImage(
@@ -169,7 +191,7 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
         updateAvailableModelImages[modelId] = false;
     }
 
-    private async void UpdateModel(int modelId){
+    private async void ImportModel(int modelId){
         updateAvailableModels[modelId] = false;
 
         // clear loaded model
@@ -233,6 +255,7 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
             MeshCollider collider = child.gameObject.AddComponent<MeshCollider>();
         }
 
+        /*
         TeleportAreaPlacer placer = loadedObject.AddComponent<TeleportAreaPlacer>();
         placer.teleportationArea = teleportationArea;
         placer.teleportationAreaAccuracy = teleportationAreaAccuracy;
@@ -240,9 +263,10 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
         placer.teleportationAreaMinSize = teleportationAreaMinSize;
         placer.indicesDuplicated = true;
         placer.CalculateAreas();
+        */
     }
     
-    public async void UpdatePodiumModel(int modelId){
+    public async void ImportPodiumModel(int modelId){
         // clear loaded model
         foreach (Transform child in podiums[modelId].transform) {
             GameObject.Destroy(child.gameObject);
@@ -293,30 +317,5 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
         foreach (Transform child in loadedObject.transform){
             MeshCollider collider = child.gameObject.AddComponent<MeshCollider>();
         }
-    }
-
-    private async void UpdateAllModelFiles(){
-        await Task.Delay(100);
-
-        for(int i=0;i<webserver.availableModelsCount;i++){
-            await Task.Run(() => UpdateModelNameFile(i));
-            await Task.Run(() => UpdateModelImageFile(i));
-            await Task.Run(() => UpdateModelFile(i));
-        }
-    }
-
-    [Unity.Netcode.ClientRpc]
-    public void UpdateModelNameClientRpc(int modelId){
-        Task.Run(() => UpdateModelNameFile(modelId));
-    }
-
-    [Unity.Netcode.ClientRpc]
-    public void UpdateModelImageClientRpc(int modelId){
-        Task.Run(() => UpdateModelImageFile(modelId));
-    }
-
-    [Unity.Netcode.ClientRpc]
-    public void UpdateModelClientRpc(int modelId){
-        Task.Run(() => UpdateModelFile(modelId));
     }
 }
