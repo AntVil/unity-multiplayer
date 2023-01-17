@@ -169,4 +169,9 @@ public class MainMenu : MonoBehaviour
         Debug.Log("Quit was pressed");
         Application.Quit();
     }
+
+    public void Help()
+    {
+        Application.OpenURL("https://support.microsoft.com/en-us/windows/find-your-ip-address-in-windows-f21a9bbc-c582-55cd-35e0-73431160a1b9#Category=Windows_10");
+    }
 }
