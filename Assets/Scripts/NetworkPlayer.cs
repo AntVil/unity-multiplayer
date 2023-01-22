@@ -1,11 +1,12 @@
 using UnityEngine;
-
+using UnityEngine.UI;
 public class NetworkPlayer : Unity.Netcode.NetworkBehaviour
 {
     // synced objects
     public GameObject leftHandNetwork;
     public GameObject rightHandNetwork;
     public GameObject headNetwork;
+    public GameObject userNameText;
 
     // actual objects
     private GameObject leftHand;
@@ -40,6 +41,7 @@ public class NetworkPlayer : Unity.Netcode.NetworkBehaviour
         leftHandNetwork.GetComponent<MeshRenderer>().material.color = colors[playerId];
         rightHandNetwork.GetComponent<MeshRenderer>().material.color = colors[playerId];
         headNetwork.GetComponent<MeshRenderer>().material.color = colors[playerId];
+        userNameText.GetComponent<Text>().text = VariableStorage.validUsername;
     }
 
     private GameObject GetActiveGameObjectWithTag(string tag)
