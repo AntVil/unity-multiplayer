@@ -3,8 +3,7 @@ using UnityEngine;
 using System;
 using System.Threading.Tasks;
 
-public class TeleportAreaPlacer : MonoBehaviour
-{
+public class TeleportAreaPlacer : MonoBehaviour{
     public GameObject teleportationArea;
     public float teleportationAreaAccuracy = 0.25f;
     public float teleportationAreaSlopeLimit = 0.01f;

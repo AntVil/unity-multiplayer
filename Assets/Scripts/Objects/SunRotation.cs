@@ -5,8 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SunRotation : MonoBehaviour
-{
+public class SunRotation : MonoBehaviour{
     private const double Deg2Rad = Math.PI / 180.0;
     private const double Rad2Deg = 180.0 / Math.PI;
 
@@ -33,8 +32,7 @@ public class SunRotation : MonoBehaviour
      * \param latitude Latitude expressed in decimal degrees.
      * \param longitude Longitude expressed in decimal degrees.
      */
-    void Update()
-    {
+    void Update(){
         DateTime dateTime = DateTime.Parse($"{date} {(int)hour}:{(int)((hour%1)*60)}");
 
         if(toogleSystemTime == true){
@@ -83,8 +81,7 @@ public class SunRotation : MonoBehaviour
         // Horizontal Coordinates
         double hourAngle = CorrectAngle(siderealTime * Deg2Rad) - rightAscension;
 
-        if (hourAngle > Math.PI)
-        {
+        if(hourAngle > Math.PI){
             hourAngle -= 2 * Math.PI;
         }
 
@@ -97,12 +94,9 @@ public class SunRotation : MonoBehaviour
 
         double azimuth = Math.Atan(aziNom / aziDenom);
 
-        if (aziDenom < 0) // In 2nd or 3rd quadrant
-        {
+        if(aziDenom < 0){ // In 2nd or 3rd quadrant
             azimuth += Math.PI;
-        }
-        else if (aziNom < 0) // In 4th quadrant
-        {
+        }else if(aziNom < 0){ // In 4th quadrant
             azimuth += 2 * Math.PI;
         }
 
@@ -115,18 +109,12 @@ public class SunRotation : MonoBehaviour
     * \param angleInRadians An angle expressed in radians.
     * \return An angle in the range 0 to 2*PI.
     */
-    private double CorrectAngle(double angleInRadians)
-    {
-        if (angleInRadians < 0)
-        {
+    private double CorrectAngle(double angleInRadians){
+        if(angleInRadians < 0){
             return 2 * Math.PI - (Math.Abs(angleInRadians) % (2 * Math.PI));
-        }
-        else if (angleInRadians > 2 * Math.PI)
-        {
+        }else if(angleInRadians > 2 * Math.PI){
             return angleInRadians % (2 * Math.PI);
-        }
-        else
-        {
+        }else{
             return angleInRadians;
         }
     }

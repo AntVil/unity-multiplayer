@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Valve.VR;
 
-public class NetworkReaction : Unity.Netcode.NetworkBehaviour
-{
+public class NetworkReaction : Unity.Netcode.NetworkBehaviour{
     public ParticleSystem positiveReaction;
     public ParticleSystem negativeReaction;
 
@@ -66,14 +65,14 @@ public class NetworkReaction : Unity.Netcode.NetworkBehaviour
 
     [Unity.Netcode.ServerRpc]
     private void ShareReactionServerRpc(ulong client, bool isPositive){
-        if (!IsServer) return;
+        if(!IsServer) return;
 
         ShareReactionClientRpc(client, isPositive);
     }
 
     [Unity.Netcode.ClientRpc]
     private void ShareReactionClientRpc(ulong client, bool isPositive){
-        if (IsOwner || OwnerClientId != client) return;
+        if(IsOwner || OwnerClientId != client) return;
 
         if(isPositive){
             positiveReaction.Play();

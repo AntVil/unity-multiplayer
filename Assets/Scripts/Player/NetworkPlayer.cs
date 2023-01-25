@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
-public class NetworkPlayer : Unity.Netcode.NetworkBehaviour
-{
+public class NetworkPlayer : Unity.Netcode.NetworkBehaviour{
     // synced objects
     public GameObject leftHandNetwork;
     public GameObject rightHandNetwork;
@@ -17,10 +16,8 @@ public class NetworkPlayer : Unity.Netcode.NetworkBehaviour
 
     public Color[] colors;
 
-    public void Start()
-    {
-        if (IsOwner)
-        {
+    public void Start(){
+        if(IsOwner){
             // rendering of own bodyparts not required
             Destroy(leftHandNetwork.GetComponent<MeshRenderer>());
             Destroy(rightHandNetwork.GetComponent<MeshRenderer>());
@@ -32,9 +29,8 @@ public class NetworkPlayer : Unity.Netcode.NetworkBehaviour
         head = GetActiveGameObjectWithTag("MainCamera");
     }
 
-    public override void OnNetworkSpawn()
-    {
-        if (IsOwner) return;
+    public override void OnNetworkSpawn(){
+        if(IsOwner) return;
 
         ulong playerId = OwnerClientId % (ulong)colors.Length;
 
@@ -44,12 +40,9 @@ public class NetworkPlayer : Unity.Netcode.NetworkBehaviour
         userNameText.GetComponent<Text>().text = VariableStorage.validUsername;
     }
 
-    private GameObject GetActiveGameObjectWithTag(string tag)
-    {
-        foreach (GameObject obj in GameObject.FindGameObjectsWithTag(tag))
-        {
-            if (obj.activeInHierarchy)
-            {
+    private GameObject GetActiveGameObjectWithTag(string tag){
+        foreach(GameObject obj in GameObject.FindGameObjectsWithTag(tag)){
+            if(obj.activeInHierarchy){
                 return obj;
             }
         }
@@ -58,10 +51,8 @@ public class NetworkPlayer : Unity.Netcode.NetworkBehaviour
         return null;
     }
 
-    public void Update()
-    {
-        if (IsOwner)
-        {
+    public void Update(){
+        if(IsOwner){
             leftHandNetwork.transform.position = leftHand.transform.position;
             rightHandNetwork.transform.position = rightHand.transform.position;
             headNetwork.transform.position = head.transform.position;

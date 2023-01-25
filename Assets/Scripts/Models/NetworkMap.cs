@@ -11,8 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dummiesman;
 
-public class NetworkMap : Unity.Netcode.NetworkBehaviour
-{
+public class NetworkMap : Unity.Netcode.NetworkBehaviour{
     public WebServer webserver;
     public WebClient client;
 
@@ -93,11 +92,11 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
     public void UpdateClient(){
         // import model when new model available
         for(int i=0;i<updateAvailableModelNames.Length;i++){
-            if(updateAvailableModelNames[i]){ ImportModelName(i); }
+            if(updateAvailableModelNames[i]) ImportModelName(i);
         }
 
         for(int i=0;i<updateAvailableModelImages.Length;i++){
-            if(updateAvailableModelImages[i]){ ImportModelImage(i); }
+            if(updateAvailableModelImages[i]) ImportModelImage(i);
         }
 
         for(int i=0;i<updateAvailableModels.Length;i++){
@@ -195,7 +194,7 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
         updateAvailableModels[modelId] = false;
 
         // clear loaded model
-        foreach (Transform child in modelAreas[modelId].transform) {
+        foreach(Transform child in modelAreas[modelId].transform) {
             GameObject.Destroy(child.gameObject);
         }
 
@@ -210,7 +209,7 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
         );
         
         Bounds modelBounds = new Bounds(loadedObject.transform.position, Vector3.zero);
-        foreach (Renderer renderer in loadedObject.GetComponentsInChildren<Renderer>()){
+        foreach(Renderer renderer in loadedObject.GetComponentsInChildren<Renderer>()){
             modelBounds.Encapsulate(renderer.bounds);
         }
         
@@ -251,7 +250,7 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
         }
 
         // add collision & teleportation
-        foreach (Transform child in loadedObject.transform){
+        foreach(Transform child in loadedObject.transform){
             MeshCollider collider = child.gameObject.AddComponent<MeshCollider>();
         }
 
@@ -268,7 +267,7 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
     
     public async void ImportPodiumModel(int modelId){
         // clear loaded model
-        foreach (Transform child in podiums[modelId].transform) {
+        foreach(Transform child in podiums[modelId].transform) {
             GameObject.Destroy(child.gameObject);
         }
 
@@ -279,13 +278,13 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
         // scale element to fit onto podium (counter without distortion)
         Bounds podiumBounds;
         podiumBounds = new Bounds(podiums[modelId].transform.position, Vector3.zero);
-        foreach (Renderer renderer in podiums[modelId].GetComponentsInChildren<Renderer>()){
+        foreach(Renderer renderer in podiums[modelId].GetComponentsInChildren<Renderer>()){
             podiumBounds.Encapsulate(renderer.bounds);
         }
 
         Bounds bounds;
         bounds = new Bounds(loadedObject.transform.position, Vector3.zero);
-        foreach (Renderer renderer in loadedObject.GetComponentsInChildren<Renderer>()){
+        foreach(Renderer renderer in loadedObject.GetComponentsInChildren<Renderer>()){
             bounds.Encapsulate(renderer.bounds);
         }
         
@@ -298,7 +297,7 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
         
         // recalculate bounds to center loaded element
         bounds = new Bounds(loadedObject.transform.position, Vector3.zero);
-        foreach (Renderer renderer in loadedObject.GetComponentsInChildren<Renderer>()){
+        foreach(Renderer renderer in loadedObject.GetComponentsInChildren<Renderer>()){
             bounds.Encapsulate(renderer.bounds);
         }
         loadedObject.transform.position = new Vector3(podiums[modelId].transform.position.x - bounds.center.x, transform.localScale.y + 0.01f, podiums[modelId].transform.position.z - bounds.center.z);
@@ -314,7 +313,7 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour
         }
 
         // add collision
-        foreach (Transform child in loadedObject.transform){
+        foreach(Transform child in loadedObject.transform){
             MeshCollider collider = child.gameObject.AddComponent<MeshCollider>();
         }
     }

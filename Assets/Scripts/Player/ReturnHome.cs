@@ -3,8 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class ReturnHome : MonoBehaviour
-{
+public class ReturnHome : MonoBehaviour{
     public Image background;
     public TextMeshProUGUI text;
 
@@ -22,20 +21,14 @@ public class ReturnHome : MonoBehaviour
     public float returnHomeCooldownSeconds;
     private float returnHomeCooldown = 0;
 
-    public void Update()
-    {
+    public void Update(){
         // teleport home logic
-        if (returnHomeCooldown <= 0)
-        {
-            if (returning)
-            {
-                if (returnHomeCounter == CAN_RETURN_HOME)
-                {
+        if(returnHomeCooldown <= 0){
+            if(returning){
+                if(returnHomeCounter == CAN_RETURN_HOME){
                     // initiate return home
                     returnHomeCounter = WILL_RETURN_HOME;
-                }
-                else if (returnHomeCounter > returnHomeSeconds)
-                {
+                }else if(returnHomeCounter > returnHomeSeconds){
                     // return home if counter is full
 
                     // vr
@@ -49,50 +42,36 @@ public class ReturnHome : MonoBehaviour
                     returnHomeCounter = HAS_RETURNED_HOME;
                     returnHomeCooldown = returnHomeCooldownSeconds;
                     UpdateScreen();
-                }
-                else if (returnHomeCounter != HAS_RETURNED_HOME)
-                {
+                }else if(returnHomeCounter != HAS_RETURNED_HOME){
                     // count up
                     returnHomeCounter += Time.deltaTime;
                     UpdateScreen();
                 }
-            }
-            else if (returnHomeCounter != CAN_RETURN_HOME)
-            {
+            }else if(returnHomeCounter != CAN_RETURN_HOME){
                 returnHomeCounter = CAN_RETURN_HOME;
                 UpdateScreen();
             }
-        }
-        else
-        {
+        }else{
             returnHomeCooldown -= Time.deltaTime;
             UpdateScreen();
         }
     }
 
-    private void UpdateScreen()
-    {
-        if(returnHomeCooldown <= 0)
-        {
-            if (returnHomeCounter > 0)
-            {
+    private void UpdateScreen(){
+        if(returnHomeCooldown <= 0){
+            if(returnHomeCounter > 0){
                 text.text = $"zurück in {(int)Math.Ceiling(returnHomeSeconds - returnHomeCounter)}";
                 SetAlpha(returnHomeCounter / returnHomeSeconds);
-            }
-            else
-            {
+            }else{
                 SetAlpha(0);
             }
-        }
-        else
-        {
+        }else{
             text.text = "willkommen zurück";
             SetAlpha(returnHomeCooldown / returnHomeCooldownSeconds);
         }
     }
 
-    private void SetAlpha(float alpha)
-    {
+    private void SetAlpha(float alpha){
         Color tempColor = background.color;
         tempColor.a = alpha;
         background.color = tempColor;
@@ -102,13 +81,11 @@ public class ReturnHome : MonoBehaviour
         text.color = tempColor;
     }
 
-    public void StartReturn()
-    {
+    public void StartReturn(){
         returning = true;
     }
 
-    public void StopReturn()
-    {
+    public void StopReturn(){
         returning = false;
     }
 }

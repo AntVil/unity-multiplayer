@@ -6,34 +6,28 @@ using Unity.Netcode.Transports.UTP;
 using System.Net.NetworkInformation;
 using System.Linq;
 
-public class NetworkStarter : MonoBehaviour
-{
+public class NetworkStarter : MonoBehaviour{
     public bool active;
 
-    public void Start()
-    {
+    public void Start(){
         StartCoroutine(StartNetwork());
     }
 
-    private IEnumerator StartNetwork()
-    {
+    private IEnumerator StartNetwork(){
         yield return new WaitForSeconds(1);
 
-        if (active)
-        {
+        if(active){
 
             Debug.Log(VariableStorage.isHost);
             Debug.Log(VariableStorage.validIP);
             Debug.Log(VariableStorage.validUsername);
 
-            if (VariableStorage.isHost)
-            {
+            if(VariableStorage.isHost){
                 Debug.Log("Start as host");
                 NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData.Address = VariableStorage.validIP;
                 NetworkManager.Singleton.StartHost();
             }
-            if (VariableStorage.isHost == false)
-            {
+            if(VariableStorage.isHost == false){
                 Debug.Log("Start as client");
                 NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData.Address = VariableStorage.validIP;
                 NetworkManager.Singleton.StartClient();

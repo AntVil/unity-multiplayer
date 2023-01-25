@@ -1,8 +1,7 @@
 using UnityEngine;
 using System;
 
-public class NetworkVoiceChat : Unity.Netcode.NetworkBehaviour
-{
+public class NetworkVoiceChat : Unity.Netcode.NetworkBehaviour{
     public int frequency = 8000;
     public int channels = 1;
     public float minAmplitude = 0;
@@ -16,10 +15,8 @@ public class NetworkVoiceChat : Unity.Netcode.NetworkBehaviour
     private float frequencyFactor;
     private float inverseFrequencyFactor;
 
-    public override void OnNetworkSpawn()
-    {
-        if (IsOwner)
-        {
+    public override void OnNetworkSpawn(){
+        if(IsOwner){
             // get lowest possible sample rate (less downsample calculations)
             int minFreq;
             int maxFreq;
@@ -31,38 +28,29 @@ public class NetworkVoiceChat : Unity.Netcode.NetworkBehaviour
             inverseFrequencyFactor = (float)(1.0 / frequencyFactor);
             
             recording = Microphone.Start(null, true, 1, recordingFrequency);
-        }
-        else
-        {
+        }else{
             AudioSource audio = GetComponent<AudioSource>();
             audio.clip = AudioClip.Create("networkRecording", 1 * frequency, channels, frequency, false);
             audio.loop = true;
         }
     }
 
-    public override void OnNetworkDespawn()
-    {
-        if (IsOwner)
-        {
+    public override void OnNetworkDespawn(){
+        if(IsOwner){
             Microphone.End(null);
         }
     }
 
-    public void Update()
-    {
-        if (IsOwner)
-        {
+    public void Update(){
+        if(IsOwner){
             pos = Microphone.GetPosition(null);
 
-            if (pos > 0)
-            {
-                if (lastPos > pos)
-                {
+            if(pos > 0){
+                if(lastPos > pos){
                     lastPos = 0;
                 }
 
-                if (pos - lastPos > 0)
-                {
+                if(pos - lastPos > 0){
                     // Allocate the space for the sample.
                     float[] sample = new float[(pos - lastPos) * channels];
 
@@ -111,44 +99,40 @@ public class NetworkVoiceChat : Unity.Netcode.NetworkBehaviour
     }
 
     [Unity.Netcode.ServerRpc]
-    private void ShareAudioServerRpc(float[] sample, int lastPos)
-    {
-        if (!IsServer) return;
+    private void ShareAudioServerRpc(float[] sample, int lastPos){
+        if(!IsServer) return;
 
         ShareAudioClientRpc(sample, lastPos);
     }
 
     [Unity.Netcode.ClientRpc]
-    private void ShareAudioClientRpc(float[] sample, int lastPos)
-    {
-        if (IsOwner) return;
+    private void ShareAudioClientRpc(float[] sample, int lastPos){
+        if(IsOwner) return;
 
         AudioSource audio = GetComponent<AudioSource>();
 
         // Put the data in the audio source.
         audio.clip.SetData(sample, lastPos);
 
-        if (!audio.isPlaying) audio.Play();
+        if(!audio.isPlaying) audio.Play();
     }
 
     [Unity.Netcode.ServerRpc]
-    private void ShareSilenceServerRpc(int silenceLength, int lastPos)
-    {
-        if (!IsServer) return;
+    private void ShareSilenceServerRpc(int silenceLength, int lastPos){
+        if(!IsServer) return;
 
         ShareSilenceClientRpc(silenceLength, lastPos);
     }
 
     [Unity.Netcode.ClientRpc]
-    private void ShareSilenceClientRpc(int silenceLength, int lastPos)
-    {
-        if (IsOwner) return;
+    private void ShareSilenceClientRpc(int silenceLength, int lastPos){
+        if(IsOwner) return;
 
         AudioSource audio = GetComponent<AudioSource>();
 
         // Put empty data in the audio source.
         audio.clip.SetData(new float[silenceLength], lastPos);
 
-        if (!audio.isPlaying) audio.Play();
+        if(!audio.isPlaying) audio.Play();
     }
 }
