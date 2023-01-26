@@ -10,6 +10,7 @@ using TMPro;
 using System.Threading;
 using System.Threading.Tasks;
 using Dummiesman;
+using Valve.VR.InteractionSystem;
 
 public class NetworkMap : Unity.Netcode.NetworkBehaviour{
     public WebServer webserver;
@@ -237,10 +238,25 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour{
                 position.x + xTranslation, 0.0f, position.z + zTranslation
             );
         });
-        
-        loadedObject.transform.parent = modelAreas[modelId].transform;
 
-        // add backfaces to meshes (adds collision & better rendering at performance cost)
+        // add collision
+        foreach(Transform child in loadedObject.transform){
+            MeshCollider collider = child.gameObject.AddComponent<MeshCollider>();
+        }
+
+        // create teleport areas
+        GameObject teleportArea = Instantiate(loadedObject);
+        foreach(Transform child in loadedObject.transform){
+            child.gameObject.GetComponent<MeshRenderer>().enabled = false;
+            child.gameObject.AddComponent<TeleportArea>();
+        }
+        teleportArea.transform.position -= new Vector3(0.0f, 0.1f, 0.0f);
+        
+        // add to hierachy
+        loadedObject.transform.parent = modelAreas[modelId].transform;
+        teleportArea.transform.parent = modelAreas[modelId].transform;
+
+        // add backfaces to meshes (adds better collision & rendering at performance cost)
         foreach(MeshFilter meshFilter in loadedObject.GetComponentsInChildren<MeshFilter>()){
             int[] indices = meshFilter.mesh.GetIndices(0);
             indices = await Task.Run(() => {
@@ -248,21 +264,6 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour{
             });
             meshFilter.mesh.SetIndices(indices, MeshTopology.Triangles, 0);
         }
-
-        // add collision & teleportation
-        foreach(Transform child in loadedObject.transform){
-            MeshCollider collider = child.gameObject.AddComponent<MeshCollider>();
-        }
-
-        /*
-        TeleportAreaPlacer placer = loadedObject.AddComponent<TeleportAreaPlacer>();
-        placer.teleportationArea = teleportationArea;
-        placer.teleportationAreaAccuracy = teleportationAreaAccuracy;
-        placer.teleportationAreaSlopeLimit = teleportationAreaSlopeLimit;
-        placer.teleportationAreaMinSize = teleportationAreaMinSize;
-        placer.indicesDuplicated = true;
-        placer.CalculateAreas();
-        */
     }
     
     public async void ImportPodiumModel(int modelId){
