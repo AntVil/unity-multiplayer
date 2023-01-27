@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using TMPro;
 
 public class ReturnHome : MonoBehaviour{
+    public Canvas canvas;
     public Image background;
     public TextMeshProUGUI text;
 
@@ -21,6 +22,10 @@ public class ReturnHome : MonoBehaviour{
     public float returnHomeCooldownSeconds;
     private float returnHomeCooldown = 0;
 
+    public void Start(){
+        canvas.worldCamera = GetActiveGameObjectWithTag("MainCamera").GetComponent<Camera>();
+    }
+
     public void Update(){
         // teleport home logic
         if(returnHomeCooldown <= 0){
@@ -32,7 +37,7 @@ public class ReturnHome : MonoBehaviour{
                     // return home if counter is full
 
                     // vr
-                    player.transform.position = new Vector3(0, 0.5f, 0);
+                    player.transform.position = new Vector3(0, 0, 0);
 
                     // keyboard
                     characterController.enabled = false;
@@ -87,5 +92,16 @@ public class ReturnHome : MonoBehaviour{
 
     public void StopReturn(){
         returning = false;
+    }
+
+    private GameObject GetActiveGameObjectWithTag(string tag){
+        foreach(GameObject obj in GameObject.FindGameObjectsWithTag(tag)){
+            if(obj.activeInHierarchy){
+                return obj;
+            }
+        }
+
+        // edge case
+        return null;
     }
 }
