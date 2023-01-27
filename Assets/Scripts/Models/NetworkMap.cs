@@ -250,7 +250,7 @@ public class NetworkMap : Unity.Netcode.NetworkBehaviour{
             child.gameObject.GetComponent<MeshRenderer>().enabled = false;
             child.gameObject.AddComponent<TeleportArea>();
         }
-        teleportArea.transform.position -= new Vector3(0.0f, 0.1f, 0.0f);
+        teleportArea.transform.position -= new Vector3(0.0f, 0.01f, 0.0f);
         
         // add to hierachy
         loadedObject.transform.parent = modelAreas[modelId].transform;
