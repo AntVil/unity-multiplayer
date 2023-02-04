@@ -15,10 +15,6 @@ public class NetworkReaction : Unity.Netcode.NetworkBehaviour{
         hasSharedNegativeReaction = false;
     }
 
-    public override void OnNetworkSpawn(){
-        
-    }
-
     void Update(){
         if(!IsOwner) return;
 
@@ -46,7 +42,7 @@ public class NetworkReaction : Unity.Netcode.NetworkBehaviour{
 
         if(positiveVR || positiveKeyboard){
             if(!hasSharedPositiveReaction){
-                ShareReactionServerRpc(OwnerClientId, true);
+                ShareReactionServerRpc(true);
                 hasSharedPositiveReaction = true;
             }
         }else{
@@ -55,7 +51,7 @@ public class NetworkReaction : Unity.Netcode.NetworkBehaviour{
 
         if(negativeVR || negativeKeyboard){
             if(!hasSharedNegativeReaction){
-                ShareReactionServerRpc(OwnerClientId, false);
+                ShareReactionServerRpc(false);
                 hasSharedNegativeReaction = true;
             }
         }else{
@@ -64,15 +60,15 @@ public class NetworkReaction : Unity.Netcode.NetworkBehaviour{
     }
 
     [Unity.Netcode.ServerRpc]
-    private void ShareReactionServerRpc(ulong client, bool isPositive){
+    private void ShareReactionServerRpc(bool isPositive){
         if(!IsServer) return;
 
-        ShareReactionClientRpc(client, isPositive);
+        ShareReactionClientRpc(isPositive);
     }
 
     [Unity.Netcode.ClientRpc]
-    private void ShareReactionClientRpc(ulong client, bool isPositive){
-        if(IsOwner || OwnerClientId != client) return;
+    private void ShareReactionClientRpc(bool isPositive){
+        if(IsOwner) return;
 
         if(isPositive){
             positiveReaction.Play();
